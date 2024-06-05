@@ -16,12 +16,16 @@ mod ui;
 
 use crate::{
     app::{App, Location, Mode},
+    paclist::get_package_list,
     ui::ui,
 };
 
 // Planned features
 // TODO filters; AUR only, orphans only, explicitly installed only, etc.
 fn main() -> Result<(), Box<dyn Error>> {
+    // Get list of packages
+    let package_list = get_package_list()?;
+
     // Terminal setup
     enable_raw_mode()?;
     let mut stderr = io::stderr();
@@ -30,8 +34,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut terminal = Terminal::new(backend)?;
 
     // Create app & run it
-    // TODO get package list
-    let mut app = App::new(Vec::new());
+    let mut app = App::new(package_list);
     let res = run_app(&mut terminal, &mut app);
 
     // Restore terminal after app execution complete

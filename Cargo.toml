@@ -9,8 +9,9 @@ license-file = "LICENSE"
 
 [dependencies]
 clap = { version = ">=4.5.4", features = ["cargo"] }
-ratatui = "0.26.3"
-crossterm = "0.25"
+ratatui = ">=0.26.3"
+crossterm = ">=0.25"
+regex = ">=1.10.4"
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"

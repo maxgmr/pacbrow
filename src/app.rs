@@ -1,25 +1,7 @@
 #[derive(Clone, Debug)]
 pub struct Package {
-    name: String,
-    version: String,
-    description: String,
-    architecture: String,
-    url: String,
-    licenses: Vec<String>,
-    groups: Vec<String>,
-    provides: Vec<String>,
-    depends_on: Vec<String>,
-    optional_deps: Vec<String>,
-    required_by: Vec<String>,
-    optional_for: Vec<String>,
-    conflicts_with: Vec<String>,
-    replaces: Vec<String>,
-    installed_size: String,
-    packager: String,
-    build_date: String,
-    install_date: String,
-    install_reason: String,
-    file_locations: Vec<String>,
+    pub name: String,
+    pub info: String,
 }
 
 pub enum Mode {
@@ -38,7 +20,6 @@ pub enum Location {
 pub struct App {
     pub mode: Mode,
     pub packages: Vec<Package>,
-    pub current_packages: Vec<Package>,
     pub current_search: String,
     pub current_list: String,
     pub current_info: String,
@@ -52,7 +33,6 @@ impl App {
     pub fn new(packages: Vec<Package>) -> Self {
         Self {
             mode: Mode::Normal,
-            current_packages: packages.clone(),
             packages,
             current_search: String::new(),
             current_list: String::new(),
@@ -67,7 +47,7 @@ impl App {
 
     pub fn package_list_str(&self) -> String {
         // TODO inefficient
-        self.current_packages
+        self.packages
             .iter()
             .map(|p| p.name.clone())
             .collect::<Vec<String>>()
