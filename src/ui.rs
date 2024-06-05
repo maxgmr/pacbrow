@@ -22,8 +22,7 @@ pub fn ui(f: &mut Frame, app: &App) {
         .constraints(vec![Constraint::Percentage(25), Constraint::Percentage(75)])
         .split(search_info_layout[1]);
 
-    // Temporary planning blocks
-    let search = Paragraph::new("Search")
+    let search = Paragraph::new(app.current_search.to_string())
         .style(match app.mode {
             Mode::Search => Style::default().fg(Color::Cyan),
             _ => Style::default(),

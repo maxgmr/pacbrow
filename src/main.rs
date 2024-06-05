@@ -64,7 +64,11 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                     KeyCode::Char(':') => {
                         app.mode = Mode::Command;
                     }
-                    KeyCode::Char('s') => {
+                    KeyCode::Char('s') | KeyCode::Char('i') => {
+                        app.mode = Mode::Search;
+                    }
+                    KeyCode::Char('r') => {
+                        app.clear(Location::Search);
                         app.mode = Mode::Search;
                     }
                     _ => {}
@@ -106,8 +110,20 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                     _ => {}
                 },
                 Mode::Search => match key.code {
-                    KeyCode::Esc => {
+                    KeyCode::Esc | KeyCode::Enter => {
                         app.mode = Mode::Normal;
+                    }
+                    // User is deleting something; if already empty exit search mode
+                    KeyCode::Backspace => {
+                        if app.current_search.is_empty() {
+                            app.mode = Mode::Normal;
+                        } else {
+                            app.delete_char(Location::Search);
+                        }
+                    }
+                    // User is typing something
+                    KeyCode::Char(new_char) => {
+                        app.add_char(new_char, Location::Search);
                     }
                     _ => {}
                 },
