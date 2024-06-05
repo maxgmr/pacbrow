@@ -11,6 +11,7 @@ use ratatui::{
 use std::{error::Error, io};
 
 mod app;
+mod paclist;
 mod ui;
 
 use crate::{
@@ -18,6 +19,8 @@ use crate::{
     ui::ui,
 };
 
+// Planned features
+// TODO filters; AUR only, orphans only, explicitly installed only, etc.
 fn main() -> Result<(), Box<dyn Error>> {
     // Terminal setup
     enable_raw_mode()?;

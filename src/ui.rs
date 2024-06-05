@@ -30,7 +30,7 @@ pub fn ui(f: &mut Frame, app: &App) {
         .block(Block::default().borders(Borders::ALL).title("Search"));
     f.render_widget(search, search_info_layout[0]);
 
-    let pac_list = Paragraph::new("Package list")
+    let pac_list = Paragraph::new(app.package_list_str())
         .style(match app.mode {
             Mode::Normal => Style::default().fg(Color::LightBlue),
             _ => Style::default(),

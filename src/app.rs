@@ -65,15 +65,16 @@ impl App {
         }
     }
 
+    pub fn package_list_str(&self) -> String {
+        // TODO inefficient
+        self.current_packages
+            .iter()
+            .map(|p| p.name.clone())
+            .collect::<Vec<String>>()
+            .join("\n")
+    }
     pub fn print_package_list(&self) {
-        println!(
-            "{}",
-            self.current_packages
-                .iter()
-                .map(|p| p.name.clone())
-                .collect::<Vec<String>>()
-                .join("\n")
-        );
+        println!("{}", self.package_list_str());
     }
 
     fn cursor_change(&mut self, location: Location, change: i32) -> usize {
