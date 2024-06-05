@@ -8,6 +8,9 @@ repository = "https://github.com/maxgmr/pacbrow"
 license-file = "LICENSE"
 
 [dependencies]
+clap = { version = ">=4.5.4", features = ["cargo"] }
+ratatui = "0.26.3"
+crossterm = "0.25"
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
