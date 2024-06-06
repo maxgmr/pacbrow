@@ -1,7 +1,6 @@
 # run "cargo make install" to freshly install pacbrow.
-# run "cargo make reinstall" to uninstall then reinstall pacbrow.
+# run "cargo make reinstall" to update pacbrow.
 # run "cargo make uninstall" to uninstall pacbrow.
-# run "cargo make update" to reinstall pacbrow without overwriting user config.
 
 [tasks.build]
 command = "cargo"
@@ -39,10 +38,7 @@ sudo rm -f /usr/local/bin/pacbrow
 dependencies = ["clean", "build", "createconfig", "addtousr"]
 
 [tasks.uninstall]
-dependencies = ["clean", "removeconfig", "deleteprogram"]
+dependencies = ["removeconfig", "deleteprogram"]
 
 [tasks.reinstall]
 dependencies = ["uninstall", "install"]
-
-[tasks.update]
-dependencies = ["clean", "createconfig", ]

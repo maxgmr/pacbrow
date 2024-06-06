@@ -80,33 +80,40 @@ pub fn read_config() -> io::Result<ConfigToml> {
         }
     }
 
+    // Will not overwrite config if running debug target
+    let allow_user_overwrite: bool;
+
     let mut config_toml =
         if let Ok(config_toml) = read_toml::<ConfigToml>(Path::new(RELATIVE_CONFIG_STR)) {
+            allow_user_overwrite = false;
             config_toml
         } else {
+            allow_user_overwrite = true;
             read_toml::<ConfigToml>(&default_config_buf)?
         };
 
     // Update config_toml with user settings
-    if let Ok(user_conf) = read_toml::<ConfigTomlUser>(&config_buf) {
-        if let Some(colours) = user_conf.colours {
-            if let Some(normal) = colours.normal {
-                config_toml.colours.normal = normal;
+    if allow_user_overwrite {
+        if let Ok(user_conf) = read_toml::<ConfigTomlUser>(&config_buf) {
+            if let Some(colours) = user_conf.colours {
+                if let Some(normal) = colours.normal {
+                    config_toml.colours.normal = normal;
+                }
+                if let Some(info) = colours.info {
+                    config_toml.colours.info = info;
+                }
+                if let Some(search) = colours.search {
+                    config_toml.colours.search = search;
+                }
+                if let Some(command) = colours.command {
+                    config_toml.colours.command = command;
+                }
+                if let Some(text) = colours.text {
+                    config_toml.colours.text = text;
+                }
             }
-            if let Some(info) = colours.info {
-                config_toml.colours.info = info;
-            }
-            if let Some(search) = colours.search {
-                config_toml.colours.search = search;
-            }
-            if let Some(command) = colours.command {
-                config_toml.colours.command = command;
-            }
-            if let Some(text) = colours.text {
-                config_toml.colours.text = text;
-            }
-        }
-    };
+        };
+    }
 
     Ok(config_toml)
 }
