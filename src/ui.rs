@@ -5,9 +5,11 @@ use ratatui::{
     Frame,
 };
 
-use crate::app::{App, Mode};
+use crate::app::{App, Mode, Package};
 
 pub fn ui(f: &mut Frame, app: &App) {
+    let selected_package: &Package = &app.packages[app.list_cursor_index];
+
     let search_info_layout = Layout::default()
         .direction(Direction::Vertical)
         .constraints(vec![
@@ -22,7 +24,7 @@ pub fn ui(f: &mut Frame, app: &App) {
         .constraints(vec![Constraint::Percentage(25), Constraint::Percentage(75)])
         .split(search_info_layout[1]);
 
-    let search = Paragraph::new(app.current_search.to_string())
+    let search = Paragraph::new(app.current_search.to_owned())
         .style(match app.mode {
             Mode::Search => Style::default().fg(Color::Cyan),
             _ => Style::default(),
@@ -38,7 +40,7 @@ pub fn ui(f: &mut Frame, app: &App) {
         .block(Block::default().borders(Borders::ALL).title("Packages"));
     f.render_widget(pac_list, info_layout[0]);
 
-    let info = Paragraph::new("Package info")
+    let info = Paragraph::new(selected_package.info.to_owned())
         .style(match app.mode {
             Mode::Normal => Style::default().fg(Color::LightGreen),
             _ => Style::default(),
@@ -46,11 +48,11 @@ pub fn ui(f: &mut Frame, app: &App) {
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .title("TODO Selected Package Name"),
+                .title(selected_package.name.to_owned()),
         );
     f.render_widget(info, info_layout[1]);
 
-    let command_entry = Paragraph::new(app.current_command.to_string())
+    let command_entry = Paragraph::new(app.current_command.to_owned())
         .style(match app.mode {
             Mode::Command => Style::default().fg(Color::LightYellow),
             _ => Style::default(),

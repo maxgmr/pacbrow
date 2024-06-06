@@ -15,7 +15,7 @@ mod paclist;
 mod ui;
 
 use crate::{
-    app::{App, Location, Mode},
+    app::{App, Location, Mode, Package},
     paclist::get_package_list,
     ui::ui,
 };
@@ -62,6 +62,8 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
     // Main loop
     loop {
         terminal.draw(|f| ui(f, app))?;
+
+        let selected_package: &Package = &app.packages[app.list_cursor_index];
 
         // Handle keypresses
         if let Event::Key(key) = event::read()? {

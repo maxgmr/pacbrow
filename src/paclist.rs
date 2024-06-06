@@ -23,11 +23,7 @@ fn parse_package_list(raw_string: String) -> io::Result<Vec<Package>> {
     for raw_entry in split_re.split(&raw_string) {
         let mut lines = raw_entry.lines();
         if let Some(name) = lines.next() {
-            let info = format!(
-                "{}\n=======\n{}",
-                name,
-                lines.collect::<Vec<&str>>().join("\n")
-            );
+            let info = lines.collect::<Vec<&str>>().join("\n");
             package_vec.push(Package {
                 name: name.to_string(),
                 info,

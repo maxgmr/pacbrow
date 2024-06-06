@@ -49,7 +49,7 @@ impl App {
         // TODO inefficient
         self.packages
             .iter()
-            .map(|p| p.name.clone())
+            .map(|p| p.name.to_owned())
             .collect::<Vec<String>>()
             .join("\n")
     }
