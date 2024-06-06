@@ -76,7 +76,7 @@ impl App {
             Location::Pacinfo => {
                 new_index = get_new_index(
                     self.info_cursor_index,
-                    self.packages[self.list_cursor_index].info.len(),
+                    self.packages[self.list_cursor_index].info.len() - 1,
                 );
                 self.info_cursor_index = new_index;
             }

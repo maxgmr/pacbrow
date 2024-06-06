@@ -23,6 +23,7 @@ use crate::{
 // Planned features
 // TODO filters; AUR only, orphans only, explicitly installed only, etc.
 // TODO non-latin characters
+// TODO customisable colours
 fn main() -> Result<(), Box<dyn Error>> {
     // Get list of packages
     let package_list = get_package_list()?;
