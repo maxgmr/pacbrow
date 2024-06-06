@@ -100,6 +100,17 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                     _ => {}
                 },
                 Mode::Info => match key.code {
+                    KeyCode::Char(':') => {
+                        app.mode = Mode::Command;
+                        app.add_char(':', Location::Command);
+                    }
+                    KeyCode::Char('s') | KeyCode::Char('i') => {
+                        app.mode = Mode::Search;
+                    }
+                    KeyCode::Char('r') => {
+                        app.clear(Location::Search);
+                        app.mode = Mode::Search;
+                    }
                     // Exit info mode
                     KeyCode::Esc | KeyCode::Char('h') | KeyCode::Left => {
                         app.mode = Mode::Normal;
