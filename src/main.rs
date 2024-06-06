@@ -77,7 +77,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                         app.mode = Mode::Command;
                         app.add_char(':', Location::Command);
                     }
-                    KeyCode::Char('s') | KeyCode::Char('i') => {
+                    KeyCode::Char('s') => {
                         app.mode = Mode::Search;
                     }
                     KeyCode::Char('r') => {
@@ -103,7 +103,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                             app.info_scroll_state.position(app.info_cursor_index);
                     }
                     // Enter info mode for the currently selected package
-                    KeyCode::Char('l') | KeyCode::Right | KeyCode::Enter => {
+                    KeyCode::Char('l') | KeyCode::Char('i') | KeyCode::Right | KeyCode::Enter => {
                         app.mode = Mode::Info;
                     }
                     _ => {}
@@ -113,15 +113,16 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                         app.mode = Mode::Command;
                         app.add_char(':', Location::Command);
                     }
-                    KeyCode::Char('s') | KeyCode::Char('i') => {
+                    KeyCode::Char('s') => {
                         app.mode = Mode::Search;
                     }
                     KeyCode::Char('r') => {
                         app.clear(Location::Search);
+                        app.refresh_search();
                         app.mode = Mode::Search;
                     }
                     // Exit info mode
-                    KeyCode::Esc | KeyCode::Char('h') | KeyCode::Left => {
+                    KeyCode::Esc | KeyCode::Char('h') | KeyCode::Char('n') | KeyCode::Left => {
                         app.mode = Mode::Normal;
                     }
                     // Scroll up package info
@@ -189,17 +190,16 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                     _ => {}
                 },
                 Mode::Search => match key.code {
-                    KeyCode::Esc | KeyCode::Enter => {
+                    KeyCode::Down | KeyCode::Esc | KeyCode::Enter => {
                         app.mode = Mode::Normal;
                     }
                     // User is deleting something; if already empty exit search mode
                     KeyCode::Backspace => {
-                        app.list_cursor_index = 0;
-                        app.info_cursor_index = 0;
                         if app.current_search.is_empty() {
                             app.mode = Mode::Normal;
                         } else {
                             app.delete_char(Location::Search);
+                            app.refresh_search();
                         }
                     }
                     // Move cursor to the left
@@ -212,9 +212,8 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                     }
                     // User is typing something
                     KeyCode::Char(new_char) => {
-                        app.list_cursor_index = 0;
-                        app.info_cursor_index = 0;
                         app.add_char(new_char, Location::Search);
+                        app.refresh_search();
                     }
                     _ => {}
                 },

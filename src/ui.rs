@@ -16,51 +16,61 @@ const COMMAND_COLOUR: Color = Color::Yellow;
 const TEXT_COLOUR: Color = Color::White;
 
 pub fn ui(f: &mut Frame, app: &mut App) {
-    let selected_package: &Package = &app.packages[app.list_cursor_index];
+    let selected_package: Option<&Package> = if !app.displayed_packages_indices.is_empty() {
+        Some(&app.packages[app.displayed_packages_indices[app.list_cursor_index]])
+    } else {
+        None
+    };
 
     let mut i: usize = 0;
-    let list_text = app
-        .packages
-        .iter()
-        .map(|pkg| {
-            i += 1;
-            if (i - 1) == app.list_cursor_index {
-                Line::from(Span::styled(
-                    pkg.name.to_owned(),
-                    Style::default()
-                        .fg(NORMAL_COLOUR)
-                        .add_modifier(Modifier::BOLD),
-                ))
-            } else {
-                Line::from(Span::styled(
-                    pkg.name.to_owned(),
-                    Style::default().fg(TEXT_COLOUR),
-                ))
-            }
-        })
-        .collect::<Vec<Line>>();
+    let list_text = match selected_package {
+        Some(_) => app
+            .displayed_packages_indices
+            .iter()
+            .map(|index| {
+                i += 1;
+                if (i - 1) == app.list_cursor_index {
+                    Line::from(Span::styled(
+                        app.packages[*index].name.to_owned(),
+                        Style::default()
+                            .fg(NORMAL_COLOUR)
+                            .add_modifier(Modifier::BOLD),
+                    ))
+                } else {
+                    Line::from(Span::styled(
+                        app.packages[*index].name.to_owned(),
+                        Style::default().fg(TEXT_COLOUR),
+                    ))
+                }
+            })
+            .collect::<Vec<Line>>(),
+        None => vec![Line::from("")],
+    };
 
     let mut i: usize = 0;
-    let info_text = selected_package
-        .info
-        .iter()
-        .map(|line| {
-            i += 1;
-            if (i - 1) == app.info_cursor_index {
-                Line::from(Span::styled(
-                    line.to_owned(),
-                    Style::default()
-                        .fg(INFO_COLOUR)
-                        .add_modifier(Modifier::BOLD),
-                ))
-            } else {
-                Line::from(Span::styled(
-                    line.to_owned(),
-                    Style::default().fg(TEXT_COLOUR),
-                ))
-            }
-        })
-        .collect::<Vec<Line>>();
+    let info_text = match selected_package {
+        Some(pkg) => pkg
+            .info
+            .iter()
+            .map(|line| {
+                i += 1;
+                if (i - 1) == app.info_cursor_index {
+                    Line::from(Span::styled(
+                        line.to_owned(),
+                        Style::default()
+                            .fg(INFO_COLOUR)
+                            .add_modifier(Modifier::BOLD),
+                    ))
+                } else {
+                    Line::from(Span::styled(
+                        line.to_owned(),
+                        Style::default().fg(TEXT_COLOUR),
+                    ))
+                }
+            })
+            .collect::<Vec<Line>>(),
+        None => vec![Line::from("")],
+    };
 
     app.list_scroll_state = app.list_scroll_state.content_length(list_text.len());
     app.info_scroll_state = app.info_scroll_state.content_length(info_text.len());
@@ -124,7 +134,10 @@ pub fn ui(f: &mut Frame, app: &mut App) {
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .title(selected_package.name.to_owned()),
+                .title(match selected_package {
+                    Some(pkg) => pkg.name.to_owned(),
+                    None => String::from(""),
+                }),
         );
     f.render_widget(info, info_layout[1]);
     f.render_stateful_widget(

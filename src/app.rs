@@ -23,6 +23,7 @@ pub enum Location {
 pub struct App {
     pub mode: Mode,
     pub packages: Vec<Package>,
+    pub displayed_packages_indices: Vec<usize>,
     pub current_search: String,
     pub current_command: String,
     pub list_scroll_state: ScrollbarState,
@@ -36,6 +37,7 @@ impl App {
     pub fn new(packages: Vec<Package>) -> Self {
         Self {
             mode: Mode::Normal,
+            displayed_packages_indices: (0..packages.len()).collect(),
             packages,
             current_search: String::new(),
             current_command: String::new(),
@@ -56,8 +58,17 @@ impl App {
             .collect::<Vec<String>>()
             .join("\n")
     }
+
     pub fn print_package_list(&self) {
         println!("{}", self.package_list_str());
+    }
+
+    pub fn refresh_search(&mut self) {
+        self.list_cursor_index = 0;
+        self.info_cursor_index = 0;
+        self.displayed_packages_indices = (0..self.packages.len())
+            .filter(|index| self.packages[*index].name.contains(&self.current_search))
+            .collect();
     }
 
     fn cursor_change(&mut self, location: Location, change: i32) -> usize {
@@ -70,7 +81,7 @@ impl App {
                 self.search_cursor_index = new_index;
             }
             Location::Paclist => {
-                let list_len = self.packages.len();
+                let list_len = self.displayed_packages_indices.len();
                 new_index = get_new_index(
                     self.list_cursor_index,
                     if list_len > 0 { list_len - 1 } else { 0 },
