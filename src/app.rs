@@ -1,7 +1,9 @@
+use ratatui::widgets::ScrollbarState;
+
 #[derive(Clone, Debug)]
 pub struct Package {
     pub name: String,
-    pub info: String,
+    pub info: Vec<String>,
 }
 
 pub enum Mode {
@@ -22,9 +24,9 @@ pub struct App {
     pub mode: Mode,
     pub packages: Vec<Package>,
     pub current_search: String,
-    pub current_list: String,
-    pub current_info: String,
     pub current_command: String,
+    pub list_scroll_state: ScrollbarState,
+    pub info_scroll_state: ScrollbarState,
     pub search_cursor_index: usize,
     pub list_cursor_index: usize,
     pub info_cursor_index: usize,
@@ -36,9 +38,9 @@ impl App {
             mode: Mode::Normal,
             packages,
             current_search: String::new(),
-            current_list: String::new(),
-            current_info: String::new(),
             current_command: String::new(),
+            list_scroll_state: ScrollbarState::default(),
+            info_scroll_state: ScrollbarState::default(),
             search_cursor_index: 0,
             list_cursor_index: 0,
             info_cursor_index: 0,
@@ -68,11 +70,14 @@ impl App {
                 self.search_cursor_index = new_index;
             }
             Location::Paclist => {
-                new_index = get_new_index(self.list_cursor_index, self.current_list.len());
+                new_index = get_new_index(self.list_cursor_index, self.packages.len());
                 self.list_cursor_index = new_index;
             }
             Location::Pacinfo => {
-                new_index = get_new_index(self.info_cursor_index, self.current_info.len());
+                new_index = get_new_index(
+                    self.info_cursor_index,
+                    self.packages[self.list_cursor_index].info.len(),
+                );
                 self.info_cursor_index = new_index;
             }
             Location::Command => {

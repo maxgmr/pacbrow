@@ -1,6 +1,7 @@
 use ratatui::{
     layout::{Constraint, Direction, Layout},
-    style::{Color, Style},
+    style::{Color, Modifier, Style},
+    text::{Line, Span},
     widgets::{Block, Borders, Paragraph},
     Frame,
 };
@@ -9,6 +10,50 @@ use crate::app::{App, Mode, Package};
 
 pub fn ui(f: &mut Frame, app: &App) {
     let selected_package: &Package = &app.packages[app.list_cursor_index];
+
+    let mut i: usize = 0;
+    let list_text = app
+        .packages
+        .iter()
+        .map(|pkg| {
+            i += 1;
+            if (i - 1) == app.list_cursor_index {
+                Line::from(Span::styled(
+                    pkg.name.to_owned(),
+                    Style::default()
+                        .fg(Color::LightBlue)
+                        .add_modifier(Modifier::BOLD),
+                ))
+            } else {
+                Line::from(Span::styled(
+                    pkg.name.to_owned(),
+                    Style::default().fg(Color::White),
+                ))
+            }
+        })
+        .collect::<Vec<Line>>();
+
+    let mut i: usize = 0;
+    let info_text = selected_package
+        .info
+        .iter()
+        .map(|line| {
+            i += 1;
+            if (i - 1) == app.info_cursor_index {
+                Line::from(Span::styled(
+                    line.to_owned(),
+                    Style::default()
+                        .fg(Color::LightGreen)
+                        .add_modifier(Modifier::BOLD),
+                ))
+            } else {
+                Line::from(Span::styled(
+                    line.to_owned(),
+                    Style::default().fg(Color::White),
+                ))
+            }
+        })
+        .collect::<Vec<Line>>();
 
     let search_info_layout = Layout::default()
         .direction(Direction::Vertical)
@@ -32,7 +77,7 @@ pub fn ui(f: &mut Frame, app: &App) {
         .block(Block::default().borders(Borders::ALL).title("Search"));
     f.render_widget(search, search_info_layout[0]);
 
-    let pac_list = Paragraph::new(app.package_list_str())
+    let pac_list = Paragraph::new(list_text.to_owned())
         .style(match app.mode {
             Mode::Normal => Style::default().fg(Color::LightBlue),
             _ => Style::default(),
@@ -40,7 +85,7 @@ pub fn ui(f: &mut Frame, app: &App) {
         .block(Block::default().borders(Borders::ALL).title("Packages"));
     f.render_widget(pac_list, info_layout[0]);
 
-    let info = Paragraph::new(selected_package.info.to_owned())
+    let info = Paragraph::new(info_text.to_owned())
         .style(match app.mode {
             Mode::Info => Style::default().fg(Color::LightGreen),
             _ => Style::default(),

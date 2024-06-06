@@ -81,11 +81,17 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                     }
                     // Scroll up package list
                     KeyCode::Char('k') | KeyCode::Up => {
+                        app.info_cursor_index = 0;
                         app.cursor_dec(Location::Paclist);
+                        app.list_scroll_state =
+                            app.list_scroll_state.position(app.list_cursor_index);
                     }
                     // Scroll down package list
                     KeyCode::Char('j') | KeyCode::Down => {
+                        app.info_cursor_index = 0;
                         app.cursor_inc(Location::Paclist);
+                        app.list_scroll_state =
+                            app.list_scroll_state.position(app.list_cursor_index);
                     }
                     // Enter info mode for the currently selected package
                     KeyCode::Char('l') | KeyCode::Right | KeyCode::Enter => {
@@ -101,10 +107,14 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                     // Scroll up package info
                     KeyCode::Char('k') | KeyCode::Up => {
                         app.cursor_dec(Location::Pacinfo);
+                        app.info_scroll_state =
+                            app.info_scroll_state.position(app.info_cursor_index);
                     }
                     // Scroll down package info
                     KeyCode::Char('j') | KeyCode::Down => {
                         app.cursor_inc(Location::Pacinfo);
+                        app.info_scroll_state =
+                            app.info_scroll_state.position(app.info_cursor_index);
                     }
                     _ => {}
                 },
