@@ -28,6 +28,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Get list of packages
     let package_list = get_package_list()?;
 
+    if package_list.is_empty() {
+        eprintln!("Unable to get package list. Please ensure you are using pacman as your package manager and that it is working properly.");
+    }
+
     // Terminal setup
     enable_raw_mode()?;
     let mut stderr = io::stderr();
@@ -86,6 +90,8 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                         app.cursor_dec(Location::Paclist);
                         app.list_scroll_state =
                             app.list_scroll_state.position(app.list_cursor_index);
+                        app.info_scroll_state =
+                            app.info_scroll_state.position(app.info_cursor_index);
                     }
                     // Scroll down package list
                     KeyCode::Char('j') | KeyCode::Down => {
@@ -93,6 +99,8 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                         app.cursor_inc(Location::Paclist);
                         app.list_scroll_state =
                             app.list_scroll_state.position(app.list_cursor_index);
+                        app.info_scroll_state =
+                            app.info_scroll_state.position(app.info_cursor_index);
                     }
                     // Enter info mode for the currently selected package
                     KeyCode::Char('l') | KeyCode::Right | KeyCode::Enter => {
@@ -186,6 +194,8 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                     }
                     // User is deleting something; if already empty exit search mode
                     KeyCode::Backspace => {
+                        app.list_cursor_index = 0;
+                        app.info_cursor_index = 0;
                         if app.current_search.is_empty() {
                             app.mode = Mode::Normal;
                         } else {
@@ -202,6 +212,8 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                     }
                     // User is typing something
                     KeyCode::Char(new_char) => {
+                        app.list_cursor_index = 0;
+                        app.info_cursor_index = 0;
                         app.add_char(new_char, Location::Search);
                     }
                     _ => {}

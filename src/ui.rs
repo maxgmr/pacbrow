@@ -1,8 +1,9 @@
 use ratatui::{
-    layout::{Constraint, Direction, Layout},
+    layout::{Constraint, Direction, Layout, Margin},
     style::{Color, Modifier, Style},
+    symbols::scrollbar,
     text::{Line, Span},
-    widgets::{Block, Borders, Paragraph},
+    widgets::{Block, Borders, Paragraph, Scrollbar, ScrollbarOrientation, Wrap},
     Frame,
 };
 
@@ -14,7 +15,7 @@ const SEARCH_COLOUR: Color = Color::Cyan;
 const COMMAND_COLOUR: Color = Color::Yellow;
 const TEXT_COLOUR: Color = Color::White;
 
-pub fn ui(f: &mut Frame, app: &App) {
+pub fn ui(f: &mut Frame, app: &mut App) {
     let selected_package: &Package = &app.packages[app.list_cursor_index];
 
     let mut i: usize = 0;
@@ -61,6 +62,9 @@ pub fn ui(f: &mut Frame, app: &App) {
         })
         .collect::<Vec<Line>>();
 
+    app.list_scroll_state = app.list_scroll_state.content_length(list_text.len());
+    app.info_scroll_state = app.info_scroll_state.content_length(info_text.len());
+
     let search_info_layout = Layout::default()
         .direction(Direction::Vertical)
         .constraints(vec![
@@ -93,20 +97,48 @@ pub fn ui(f: &mut Frame, app: &App) {
             Mode::Normal => Style::default().fg(NORMAL_COLOUR),
             _ => Style::default(),
         })
+        .wrap(Wrap { trim: false })
+        .scroll((app.list_cursor_index as u16, 0))
         .block(Block::default().borders(Borders::ALL).title("Packages"));
     f.render_widget(pac_list, info_layout[0]);
+    f.render_stateful_widget(
+        Scrollbar::new(ScrollbarOrientation::VerticalLeft)
+            .symbols(scrollbar::VERTICAL)
+            .begin_symbol(None)
+            .track_symbol(None)
+            .end_symbol(None),
+        info_layout[0].inner(&Margin {
+            vertical: 1,
+            horizontal: 0,
+        }),
+        &mut app.list_scroll_state,
+    );
 
     let info = Paragraph::new(info_text.to_owned())
         .style(match app.mode {
             Mode::Info => Style::default().fg(INFO_COLOUR),
             _ => Style::default(),
         })
+        .wrap(Wrap { trim: false })
+        .scroll((app.info_cursor_index as u16, 0))
         .block(
             Block::default()
                 .borders(Borders::ALL)
                 .title(selected_package.name.to_owned()),
         );
     f.render_widget(info, info_layout[1]);
+    f.render_stateful_widget(
+        Scrollbar::new(ScrollbarOrientation::VerticalLeft)
+            .symbols(scrollbar::VERTICAL)
+            .begin_symbol(None)
+            .track_symbol(None)
+            .end_symbol(None),
+        info_layout[1].inner(&Margin {
+            vertical: 1,
+            horizontal: 0,
+        }),
+        &mut app.info_scroll_state,
+    );
 
     let command_entry = Paragraph::new(app.current_command.to_owned())
         .style(match app.mode {

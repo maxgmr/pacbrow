@@ -70,13 +70,18 @@ impl App {
                 self.search_cursor_index = new_index;
             }
             Location::Paclist => {
-                new_index = get_new_index(self.list_cursor_index, self.packages.len());
+                let list_len = self.packages.len();
+                new_index = get_new_index(
+                    self.list_cursor_index,
+                    if list_len > 0 { list_len - 1 } else { 0 },
+                );
                 self.list_cursor_index = new_index;
             }
             Location::Pacinfo => {
+                let info_len = self.packages[self.list_cursor_index].info.len();
                 new_index = get_new_index(
                     self.info_cursor_index,
-                    self.packages[self.list_cursor_index].info.len() - 1,
+                    if info_len > 0 { info_len - 1 } else { 0 },
                 );
                 self.info_cursor_index = new_index;
             }
