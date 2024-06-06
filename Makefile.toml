@@ -1,0 +1,44 @@
+# run "cargo make install" to freshly install pacbrow.
+# run "cargo make reinstall" to update pacbrow.
+# run "cargo make uninstall" to uninstall pacbrow.
+
+[tasks.build]
+command = "cargo"
+args = ["build", "--release"]
+
+[tasks.clean]
+command = "cargo"
+args = ["clean"]
+
+[tasks.createconfig]
+script = '''
+sudo mkdir -p ~/.config/pacbrow/
+sudo cp -n ./config.toml ~/.config/pacbrow/config.toml
+sudo chmod 666 ~/.config/pacbrow/config.toml
+sudo cp ./config.toml ~/.config/pacbrow/default-config.toml
+'''
+
+[tasks.addtousr]
+script = '''
+sudo mkdir -p /usr/local/bin/
+sudo cp ./target/release/pacbrow /usr/local/bin/pacbrow
+'''
+
+[tasks.removeconfig]
+script = '''
+sudo rm -rf ~/.config/pacbrow/
+'''
+
+[tasks.deleteprogram]
+script = '''
+sudo rm -f /usr/local/bin/pacbrow
+'''
+
+[tasks.install]
+dependencies = ["clean", "build", "createconfig", "addtousr"]
+
+[tasks.uninstall]
+dependencies = ["removeconfig", "deleteprogram"]
+
+[tasks.reinstall]
+dependencies = ["uninstall", "install"]

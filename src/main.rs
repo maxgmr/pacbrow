@@ -15,6 +15,7 @@ use std::{
 };
 
 mod app;
+mod config;
 mod paclist;
 mod ui;
 
@@ -29,7 +30,7 @@ const TICK_RATE_MS: u64 = 250;
 // Planned features
 // TODO filters; AUR only, orphans only, explicitly installed only, etc.
 // TODO non-latin characters
-// TODO customisable colours
+// TODO customisable colours/config file
 fn main() -> Result<(), Box<dyn Error>> {
     // Get list of packages
     let package_list = get_package_list()?;
