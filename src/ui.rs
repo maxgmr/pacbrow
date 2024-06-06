@@ -9,12 +9,6 @@ use ratatui::{
 
 use crate::app::{App, Mode, Package};
 
-const NORMAL_COLOUR: Color = Color::Blue;
-const INFO_COLOUR: Color = Color::Green;
-const SEARCH_COLOUR: Color = Color::Cyan;
-const COMMAND_COLOUR: Color = Color::Yellow;
-const TEXT_COLOUR: Color = Color::White;
-
 pub fn ui(f: &mut Frame, app: &mut App) {
     let selected_package: Option<&Package> = if !app.displayed_packages_indices.is_empty() {
         Some(&app.packages[app.displayed_packages_indices[app.list_cursor_index]])
@@ -33,13 +27,13 @@ pub fn ui(f: &mut Frame, app: &mut App) {
                     Line::from(Span::styled(
                         app.packages[*index].name.to_owned(),
                         Style::default()
-                            .fg(NORMAL_COLOUR)
+                            .fg(app.config.colours.normal)
                             .add_modifier(Modifier::BOLD),
                     ))
                 } else {
                     Line::from(Span::styled(
                         app.packages[*index].name.to_owned(),
-                        Style::default().fg(TEXT_COLOUR),
+                        Style::default().fg(app.config.colours.text),
                     ))
                 }
             })
@@ -58,13 +52,13 @@ pub fn ui(f: &mut Frame, app: &mut App) {
                     Line::from(Span::styled(
                         line.to_owned(),
                         Style::default()
-                            .fg(INFO_COLOUR)
+                            .fg(app.config.colours.info)
                             .add_modifier(Modifier::BOLD),
                     ))
                 } else {
                     Line::from(Span::styled(
                         line.to_owned(),
-                        Style::default().fg(TEXT_COLOUR),
+                        Style::default().fg(app.config.colours.text),
                     ))
                 }
             })
@@ -96,7 +90,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
 
     let search = Paragraph::new(app.current_search.to_owned())
         .style(match app.mode {
-            Mode::Search => Style::default().fg(SEARCH_COLOUR),
+            Mode::Search => Style::default().fg(app.config.colours.search),
             _ => Style::default(),
         })
         .block(Block::default().borders(Borders::ALL).title("Search"));
@@ -104,7 +98,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
 
     let pac_list = Paragraph::new(list_text.to_owned())
         .style(match app.mode {
-            Mode::Normal => Style::default().fg(NORMAL_COLOUR),
+            Mode::Normal => Style::default().fg(app.config.colours.normal),
             _ => Style::default(),
         })
         .wrap(Wrap { trim: false })
@@ -126,7 +120,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
 
     let info = Paragraph::new(info_text.to_owned())
         .style(match app.mode {
-            Mode::Info => Style::default().fg(INFO_COLOUR),
+            Mode::Info => Style::default().fg(app.config.colours.info),
             _ => Style::default(),
         })
         .wrap(Wrap { trim: false })
@@ -155,7 +149,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
 
     let command_entry = Paragraph::new(app.current_command.to_owned())
         .style(match app.mode {
-            Mode::Command => Style::default().fg(COMMAND_COLOUR),
+            Mode::Command => Style::default().fg(app.config.colours.command),
             _ => Style::default(),
         })
         .block(
@@ -166,10 +160,16 @@ pub fn ui(f: &mut Frame, app: &mut App) {
     f.render_widget(command_entry, bottom_layout[0]);
 
     let mode_info = (match app.mode {
-        Mode::Normal => Paragraph::new("NORMAL").style(Style::default().fg(NORMAL_COLOUR)),
-        Mode::Info => Paragraph::new("INFO").style(Style::default().fg(INFO_COLOUR)),
-        Mode::Search => Paragraph::new("SEARCH").style(Style::default().fg(SEARCH_COLOUR)),
-        Mode::Command => Paragraph::new("COMMAND").style(Style::default().fg(COMMAND_COLOUR)),
+        Mode::Normal => {
+            Paragraph::new("NORMAL").style(Style::default().fg(app.config.colours.normal))
+        }
+        Mode::Info => Paragraph::new("INFO").style(Style::default().fg(app.config.colours.info)),
+        Mode::Search => {
+            Paragraph::new("SEARCH").style(Style::default().fg(app.config.colours.search))
+        }
+        Mode::Command => {
+            Paragraph::new("COMMAND").style(Style::default().fg(app.config.colours.command))
+        }
     })
     .block(Block::default().borders(Borders::ALL).title("Mode"));
     f.render_widget(mode_info, bottom_layout[1]);

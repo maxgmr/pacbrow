@@ -1,5 +1,7 @@
 use ratatui::widgets::ScrollbarState;
 
+use crate::config::ConfigToml;
+
 #[derive(Clone, Debug)]
 pub struct Package {
     pub name: String,
@@ -22,6 +24,7 @@ pub enum Location {
 
 pub struct App {
     pub mode: Mode,
+    pub config: ConfigToml,
     pub packages: Vec<Package>,
     pub displayed_packages_indices: Vec<usize>,
     pub current_search: String,
@@ -34,9 +37,10 @@ pub struct App {
     pub command_cursor_index: usize,
 }
 impl App {
-    pub fn new(packages: Vec<Package>) -> Self {
+    pub fn new(config: ConfigToml, packages: Vec<Package>) -> Self {
         Self {
             mode: Mode::Normal,
+            config,
             displayed_packages_indices: (0..packages.len()).collect(),
             packages,
             current_search: String::new(),

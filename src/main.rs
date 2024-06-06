@@ -21,6 +21,7 @@ mod ui;
 
 use crate::{
     app::{App, Location, Mode},
+    config::read_config,
     paclist::get_package_list,
     ui::ui,
 };
@@ -32,6 +33,9 @@ const TICK_RATE_MS: u64 = 250;
 // TODO non-latin characters
 // TODO customisable colours/config file
 fn main() -> Result<(), Box<dyn Error>> {
+    // Load config
+    let config_toml = read_config()?;
+
     // Get list of packages
     let package_list = get_package_list()?;
 
@@ -47,7 +51,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut terminal = Terminal::new(backend)?;
 
     // Create app & run it
-    let mut app = App::new(package_list);
+    let mut app = App::new(config_toml, package_list);
     let res = run_app(&mut terminal, &mut app, Duration::from_millis(TICK_RATE_MS));
 
     // Restore terminal after app execution complete

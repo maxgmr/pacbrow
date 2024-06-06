@@ -1,0 +1,6 @@
+[colours]
+normal = "blue"
+info = "green"
+search = "cyan"
+command = "yellow"
+text = "white"
