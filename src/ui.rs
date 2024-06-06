@@ -21,7 +21,7 @@ pub fn ui(f: &mut Frame, app: &App) {
 
     let info_layout = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints(vec![Constraint::Percentage(25), Constraint::Percentage(75)])
+        .constraints(vec![Constraint::Percentage(30), Constraint::Percentage(70)])
         .split(search_info_layout[1]);
 
     let search = Paragraph::new(app.current_search.to_owned())
@@ -57,6 +57,23 @@ pub fn ui(f: &mut Frame, app: &App) {
             Mode::Command => Style::default().fg(Color::LightYellow),
             _ => Style::default(),
         })
-        .block(Block::default().borders(Borders::ALL).title("Command <:>"));
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title("Command (Type \":help\" for help)"),
+        );
     f.render_widget(command_entry, search_info_layout[2]);
+
+    // Render the cursor
+    match app.mode {
+        Mode::Command => f.set_cursor(
+            search_info_layout[2].x + app.command_cursor_index as u16 + 1,
+            search_info_layout[2].y + 1,
+        ),
+        Mode::Search => f.set_cursor(
+            search_info_layout[0].x + app.search_cursor_index as u16 + 1,
+            search_info_layout[0].y + 1,
+        ),
+        _ => {}
+    }
 }

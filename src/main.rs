@@ -63,14 +63,13 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
     loop {
         terminal.draw(|f| ui(f, app))?;
 
-        let selected_package: &Package = &app.packages[app.list_cursor_index];
-
         // Handle keypresses
         if let Event::Key(key) = event::read()? {
             match app.mode {
                 Mode::Normal => match key.code {
                     KeyCode::Char(':') => {
                         app.mode = Mode::Command;
+                        app.add_char(':', Location::Command);
                     }
                     KeyCode::Char('s') | KeyCode::Char('i') => {
                         app.mode = Mode::Search;
@@ -79,6 +78,10 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                         app.clear(Location::Search);
                         app.mode = Mode::Search;
                     }
+                    // Scroll up package list
+                    KeyCode::Char('k') | KeyCode::Up => {}
+                    // Scroll down package list
+                    KeyCode::Char('j') | KeyCode::Down => {}
                     _ => {}
                 },
                 Mode::Command => match key.code {
@@ -89,11 +92,16 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                     }
                     // User submits typed command
                     KeyCode::Enter => match app.current_command.as_str() {
-                        "q" => {
+                        ":help" | ":h" => {
+                            // TODO show help page
+                            app.clear(Location::Command);
+                            app.mode = Mode::Normal;
+                        }
+                        ":q" => {
                             app.clear(Location::Command);
                             return Ok(false);
                         }
-                        "qp" | "pq" => {
+                        ":qp" | ":pq" => {
                             app.clear(Location::Command);
                             return Ok(true);
                         }
@@ -105,11 +113,20 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                     },
                     // User is deleting something; if already empty exit command mode
                     KeyCode::Backspace => {
-                        if app.current_command.is_empty() {
+                        if app.current_command.len() == 1 {
+                            app.clear(Location::Command);
                             app.mode = Mode::Normal;
                         } else {
                             app.delete_char(Location::Command);
                         }
+                    }
+                    // Move cursor to the left
+                    KeyCode::Left => {
+                        app.cursor_dec(Location::Command);
+                    }
+                    // Move cursor to the right
+                    KeyCode::Right => {
+                        app.cursor_inc(Location::Command);
                     }
                     // User is typing something
                     KeyCode::Char(new_char) => {
@@ -128,6 +145,14 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                         } else {
                             app.delete_char(Location::Search);
                         }
+                    }
+                    // Move cursor to the left
+                    KeyCode::Left => {
+                        app.cursor_dec(Location::Search);
+                    }
+                    // Move cursor to the right
+                    KeyCode::Right => {
+                        app.cursor_inc(Location::Search);
                     }
                     // User is typing something
                     KeyCode::Char(new_char) => {
