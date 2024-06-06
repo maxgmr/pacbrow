@@ -6,6 +6,7 @@ pub struct Package {
 
 pub enum Mode {
     Normal,
+    Info,
     Search,
     Command,
 }

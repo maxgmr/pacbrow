@@ -15,13 +15,14 @@ mod paclist;
 mod ui;
 
 use crate::{
-    app::{App, Location, Mode, Package},
+    app::{App, Location, Mode},
     paclist::get_package_list,
     ui::ui,
 };
 
 // Planned features
 // TODO filters; AUR only, orphans only, explicitly installed only, etc.
+// TODO non-latin characters
 fn main() -> Result<(), Box<dyn Error>> {
     // Get list of packages
     let package_list = get_package_list()?;
@@ -79,9 +80,32 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                         app.mode = Mode::Search;
                     }
                     // Scroll up package list
-                    KeyCode::Char('k') | KeyCode::Up => {}
+                    KeyCode::Char('k') | KeyCode::Up => {
+                        app.cursor_dec(Location::Paclist);
+                    }
                     // Scroll down package list
-                    KeyCode::Char('j') | KeyCode::Down => {}
+                    KeyCode::Char('j') | KeyCode::Down => {
+                        app.cursor_inc(Location::Paclist);
+                    }
+                    // Enter info mode for the currently selected package
+                    KeyCode::Char('l') | KeyCode::Right | KeyCode::Enter => {
+                        app.mode = Mode::Info;
+                    }
+                    _ => {}
+                },
+                Mode::Info => match key.code {
+                    // Exit info mode
+                    KeyCode::Esc | KeyCode::Char('h') | KeyCode::Left => {
+                        app.mode = Mode::Normal;
+                    }
+                    // Scroll up package info
+                    KeyCode::Char('k') | KeyCode::Up => {
+                        app.cursor_dec(Location::Pacinfo);
+                    }
+                    // Scroll down package info
+                    KeyCode::Char('j') | KeyCode::Down => {
+                        app.cursor_inc(Location::Pacinfo);
+                    }
                     _ => {}
                 },
                 Mode::Command => match key.code {

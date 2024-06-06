@@ -42,7 +42,7 @@ pub fn ui(f: &mut Frame, app: &App) {
 
     let info = Paragraph::new(selected_package.info.to_owned())
         .style(match app.mode {
-            Mode::Normal => Style::default().fg(Color::LightGreen),
+            Mode::Info => Style::default().fg(Color::LightGreen),
             _ => Style::default(),
         })
         .block(
