@@ -39,7 +39,7 @@ pub struct App {
 impl App {
     pub fn new(config: ConfigToml, packages: Vec<Package>) -> Self {
         Self {
-            mode: Mode::Normal,
+            mode: Mode::Search,
             config,
             displayed_packages_indices: (0..packages.len()).collect(),
             packages,
