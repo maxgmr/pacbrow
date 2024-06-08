@@ -6,12 +6,15 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use crate::app::Mode;
+
 trait Config {}
 
-// TODO lots of code duplication
+// TODO too much code duplication
 #[derive(Debug, Deserialize)]
 struct ConfigTomlUser {
     colours: Option<ColoursUser>,
+    operation: Option<OperationUser>,
 }
 impl Config for ConfigTomlUser {}
 
@@ -25,8 +28,15 @@ struct ColoursUser {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct OperationUser {
+    pub starting_mode: Option<Mode>,
+    pub allow_colon_in_search: Option<bool>,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct ConfigToml {
     pub colours: Colours,
+    pub operation: Operation,
 }
 impl Config for ConfigToml {}
 
@@ -39,8 +49,14 @@ pub struct Colours {
     pub text: Color,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct Operation {
+    pub starting_mode: Mode,
+    pub allow_colon_in_search: bool,
+}
+
 // Used for development.
-const RELATIVE_CONFIG_STR: &str = r"./config.toml";
+const DEV_CONFIG_STR: &str = "./config.toml";
 // Default.
 const DEFAULT_CONFIG_STR: &str = r".config/pacbrow/default-config.toml";
 // User-defined settings. Can overwrite.
@@ -63,7 +79,7 @@ pub fn read_config() -> io::Result<ConfigToml> {
     let mut config_buf = PathBuf::from(&home_dir);
     config_buf.push(CONFIG_STR);
 
-    fn read_toml<T: Config + DeserializeOwned>(path: &Path) -> io::Result<T> {
+    fn read_toml<T: Config + DeserializeOwned + std::fmt::Debug>(path: &Path) -> io::Result<T> {
         match fs::read_to_string(path) {
             Ok(toml_str) => match toml::from_str(&toml_str) {
                 Ok(config_toml) => Ok(config_toml),
@@ -83,7 +99,8 @@ pub fn read_config() -> io::Result<ConfigToml> {
     let allow_user_overwrite: bool;
 
     let mut config_toml =
-        if let Ok(config_toml) = read_toml::<ConfigToml>(Path::new(RELATIVE_CONFIG_STR)) {
+        if let Ok(config_toml) = read_toml::<ConfigToml>(Path::new(DEV_CONFIG_STR)) {
+            println!("ping");
             allow_user_overwrite = false;
             config_toml
         } else {
@@ -109,6 +126,15 @@ pub fn read_config() -> io::Result<ConfigToml> {
                 }
                 if let Some(text) = colours.text {
                     config_toml.colours.text = text;
+                }
+            }
+
+            if let Some(operation) = user_conf.operation {
+                if let Some(starting_mode) = operation.starting_mode {
+                    config_toml.operation.starting_mode = starting_mode;
+                }
+                if let Some(allow_colon_in_search) = operation.allow_colon_in_search {
+                    config_toml.operation.allow_colon_in_search = allow_colon_in_search;
                 }
             }
         };

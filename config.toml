@@ -4,3 +4,7 @@ info = "green"
 search = "cyan"
 command = "yellow"
 text = "white"
+
+[operation]
+starting_mode = "search"
+allow_colon_in_search = false

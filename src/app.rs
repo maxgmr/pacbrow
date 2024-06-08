@@ -1,4 +1,5 @@
 use ratatui::widgets::ScrollbarState;
+use serde::Deserialize;
 
 use crate::config::ConfigToml;
 
@@ -8,10 +9,15 @@ pub struct Package {
     pub info: Vec<String>,
 }
 
+#[derive(Debug, Deserialize, Copy, Clone)]
 pub enum Mode {
+    #[serde(alias = "normal", alias = "NORMAL")]
     Normal,
+    #[serde(alias = "info", alias = "INFO")]
     Info,
+    #[serde(alias = "search", alias = "SEARCH")]
     Search,
+    #[serde(alias = "command", alias = "COMMAND")]
     Command,
 }
 
@@ -39,8 +45,7 @@ pub struct App {
 impl App {
     pub fn new(config: ConfigToml, packages: Vec<Package>) -> Self {
         Self {
-            mode: Mode::Search,
-            config,
+            mode: config.operation.starting_mode,
             displayed_packages_indices: (0..packages.len()).collect(),
             packages,
             current_search: String::new(),
@@ -51,6 +56,7 @@ impl App {
             list_cursor_index: 0,
             info_cursor_index: 0,
             command_cursor_index: 0,
+            config,
         }
     }
 

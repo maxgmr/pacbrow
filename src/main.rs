@@ -92,6 +92,8 @@ fn run_app<B: Backend>(
 
         if crossterm::event::poll(timeout)? {
             // Handle keypresses
+            // TODO make this cleaner
+            // TODO add specific methods for switching modes in App
             if let Event::Key(key) = event::read()? {
                 match app.mode {
                     Mode::Normal => match key.code {
@@ -217,6 +219,17 @@ fn run_app<B: Backend>(
                     Mode::Search => match key.code {
                         KeyCode::Down | KeyCode::Esc | KeyCode::Enter => {
                             app.mode = Mode::Normal;
+                        }
+                        KeyCode::Char(':') => {
+                            // Only enter the colon if config allows; otherwise, switch to command
+                            // mode.
+                            if app.config.operation.allow_colon_in_search {
+                                app.add_char(':', Location::Search);
+                                app.refresh_search();
+                            } else {
+                                app.mode = Mode::Command;
+                                app.add_char(':', Location::Command);
+                            }
                         }
                         // User is deleting something; if already empty exit search mode
                         KeyCode::Backspace => {
