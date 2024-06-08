@@ -13,9 +13,15 @@ args = ["clean"]
 [tasks.createconfig]
 script = '''
 sudo mkdir -p ~/.config/pacbrow/
-sudo cp -n ./config.toml ~/.config/pacbrow/config.toml
-sudo chmod 666 ~/.config/pacbrow/config.toml
-sudo cp ./config.toml ~/.config/pacbrow/default-config.toml
+sudo cp ./configcomment.toml ./tempconfig.toml
+sudo chmod 777 ./tempconfig.toml
+sudo cat ./config.toml >> ./tempconfig.toml
+sudo cp -n ./tempconfig.toml ~/.config/pacbrow/config.toml
+sudo rm ./tempconfig.toml
+sudo \cp -i ./defaultconfigcomment.toml ~/.config/pacbrow/default-config.toml
+sudo chmod 777 ~/.config/pacbrow/default-config.toml
+sudo cat ./config.toml >> ~/.config/pacbrow/default-config.toml
+sudo chmod 555 ~/.config/pacbrow/default-config.toml
 '''
 
 [tasks.addtousr]
