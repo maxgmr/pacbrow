@@ -64,7 +64,6 @@ pub fn read_config() -> io::Result<ConfigToml> {
     config_buf.push(CONFIG_STR);
 
     fn read_toml<T: Config + DeserializeOwned>(path: &Path) -> io::Result<T> {
-        println!("{}", path.display());
         match fs::read_to_string(path) {
             Ok(toml_str) => match toml::from_str(&toml_str) {
                 Ok(config_toml) => Ok(config_toml),

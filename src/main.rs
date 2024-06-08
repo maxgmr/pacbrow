@@ -31,7 +31,10 @@ const TICK_RATE_MS: u64 = 250;
 // Planned features
 // TODO filters; AUR only, orphans only, explicitly installed only, etc.
 // TODO non-latin characters
-// TODO customisable colours/config file
+// TODO help page
+// TODO list number of results and index of current result
+// TODO sort by size, date installed, etc.
+// TODO search by fields
 fn main() -> Result<(), Box<dyn Error>> {
     // Load config
     let config_toml = read_config()?;
