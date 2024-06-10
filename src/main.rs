@@ -185,9 +185,19 @@ fn run_app<B: Backend>(
                                 app.clear(Location::Command);
                                 return Ok(false);
                             }
+                            ":p" | ":print" => {
+                                app.print_package_list();
+                                app.clear(Location::Command);
+                                app.mode = Mode::Normal;
+                            }
                             ":qp" | ":pq" => {
                                 app.clear(Location::Command);
                                 return Ok(true);
+                            }
+                            ":c" | "commands" => {
+                                app.clear(Location::Command);
+                                app.display_text = display_texts::COMMAND_LIST;
+                                app.mode = Mode::Display;
                             }
                             // TODO user feedback on unknown command
                             _ => {

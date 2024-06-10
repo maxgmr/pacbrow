@@ -1,3 +1,12 @@
+pub const COMMAND_LIST: &str = "--COMMAND LIST--
+Many commands can be combined; e.g., :qp prints the current package list and exits the program.
+:q,:quit                Exit pacbrow
+:p,:print               Print current package list
+:c,:commands            Display list of commands
+:h,:help                Open help page
+-------
+";
+
 pub const HELP_TEXT: &str = "--PACBROW HELP--
 This help screen can be exited at any time by pressing the <Esc> key. pacbrow can be exited by typing \":q\" then pressing <Enter>.
 
@@ -60,10 +69,10 @@ j,<Down>                Scroll down the displayed text
 
 
 --COMMANDS--
-Many commands can be combined into one; e.g., :qp prints the current package list and exits the program.
+Many commands can be combined; e.g., :qp prints the current package list and exits the program.
 :q,:quit                Exit pacbrow
-:p                      Print current package list
-:c                      Display list of commands
+:p,:print               Print current package list
+:c,:commands            Display list of commands
 :h,:help                Open help page
 -------
 
