@@ -24,6 +24,7 @@ struct ColoursUser {
     info: Option<Color>,
     search: Option<Color>,
     command: Option<Color>,
+    display: Option<Color>,
     text: Option<Color>,
 }
 
@@ -46,6 +47,7 @@ pub struct Colours {
     pub info: Color,
     pub search: Color,
     pub command: Color,
+    pub display: Color,
     pub text: Color,
 }
 
@@ -123,6 +125,9 @@ pub fn read_config() -> io::Result<ConfigToml> {
                 }
                 if let Some(command) = colours.command {
                     config_toml.colours.command = command;
+                }
+                if let Some(display) = colours.display {
+                    config_toml.colours.display = display;
                 }
                 if let Some(text) = colours.text {
                     config_toml.colours.text = text;

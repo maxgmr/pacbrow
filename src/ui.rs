@@ -170,6 +170,9 @@ pub fn ui(f: &mut Frame, app: &mut App) {
         Mode::Command => {
             Paragraph::new("COMMAND").style(Style::default().fg(app.config.colours.command))
         }
+        Mode::Display => {
+            Paragraph::new("DISPLAY").style(Style::default().fg(app.config.colours.display))
+        }
     })
     .block(Block::default().borders(Borders::ALL).title("Mode"));
     f.render_widget(mode_info, bottom_layout[1]);

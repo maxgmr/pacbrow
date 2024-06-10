@@ -255,6 +255,9 @@ fn run_app<B: Backend>(
                         }
                         _ => {}
                     },
+                    Mode::Display => match key.code {
+                        _ => {}
+                    },
                 }
             }
         }

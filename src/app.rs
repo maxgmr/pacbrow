@@ -19,6 +19,7 @@ pub enum Mode {
     Search,
     #[serde(alias = "command", alias = "COMMAND")]
     Command,
+    Display,
 }
 
 pub enum Location {

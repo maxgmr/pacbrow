@@ -3,6 +3,7 @@ normal = "blue"
 info = "green"
 search = "cyan"
 command = "yellow"
+display = "magenta"
 text = "white"
 
 [operation]
