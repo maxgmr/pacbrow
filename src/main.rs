@@ -16,6 +16,7 @@ use std::{
 
 mod app;
 mod config;
+mod display_texts;
 mod paclist;
 mod ui;
 
@@ -35,6 +36,7 @@ const TICK_RATE_MS: u64 = 250;
 // TODO list number of results and index of current result
 // TODO sort by size, date installed, etc.
 // TODO search by fields
+// TODO allow copying of line in info mode to clipboard
 fn main() -> Result<(), Box<dyn Error>> {
     // Load config
     let config_toml = read_config()?;
@@ -175,11 +177,11 @@ fn run_app<B: Backend>(
                         // User submits typed command
                         KeyCode::Enter => match app.current_command.as_str() {
                             ":help" | ":h" => {
-                                // TODO show help page
                                 app.clear(Location::Command);
-                                app.mode = Mode::Normal;
+                                app.display_text = display_texts::HELP_TEXT;
+                                app.mode = Mode::Display;
                             }
-                            ":q" => {
+                            ":quit" | ":q" => {
                                 app.clear(Location::Command);
                                 return Ok(false);
                             }
@@ -256,6 +258,25 @@ fn run_app<B: Backend>(
                         _ => {}
                     },
                     Mode::Display => match key.code {
+                        KeyCode::Esc => {
+                            app.mode = Mode::Normal;
+                        }
+                        KeyCode::Char(':') => {
+                            app.mode = Mode::Command;
+                            app.add_char(':', Location::Command);
+                        }
+                        // Scroll up
+                        KeyCode::Char('k') | KeyCode::Up => {
+                            app.cursor_dec(Location::Pacinfo);
+                            app.info_scroll_state =
+                                app.info_scroll_state.position(app.info_cursor_index);
+                        }
+                        // Scroll down
+                        KeyCode::Char('j') | KeyCode::Down => {
+                            app.cursor_inc(Location::Pacinfo);
+                            app.info_scroll_state =
+                                app.info_scroll_state.position(app.info_cursor_index);
+                        }
                         _ => {}
                     },
                 }

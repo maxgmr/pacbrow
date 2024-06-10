@@ -102,7 +102,6 @@ pub fn read_config() -> io::Result<ConfigToml> {
 
     let mut config_toml =
         if let Ok(config_toml) = read_toml::<ConfigToml>(Path::new(DEV_CONFIG_STR)) {
-            println!("ping");
             allow_user_overwrite = false;
             config_toml
         } else {

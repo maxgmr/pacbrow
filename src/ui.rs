@@ -9,6 +9,7 @@ use ratatui::{
 
 use crate::app::{App, Mode, Package};
 
+// TODO: move more logic into app.rs and out of ui.rs
 pub fn ui(f: &mut Frame, app: &mut App) {
     let selected_package: Option<&Package> = if !app.displayed_packages_indices.is_empty() {
         Some(&app.packages[app.displayed_packages_indices[app.list_cursor_index]])
@@ -17,53 +18,70 @@ pub fn ui(f: &mut Frame, app: &mut App) {
     };
 
     let mut i: usize = 0;
-    let list_text = match selected_package {
-        Some(_) => app
-            .displayed_packages_indices
-            .iter()
-            .map(|index| {
-                i += 1;
-                if (i - 1) == app.list_cursor_index {
-                    Line::from(Span::styled(
-                        app.packages[*index].name.to_owned(),
-                        Style::default()
-                            .fg(app.config.colours.normal)
-                            .add_modifier(Modifier::BOLD),
-                    ))
-                } else {
-                    Line::from(Span::styled(
-                        app.packages[*index].name.to_owned(),
-                        Style::default().fg(app.config.colours.text),
-                    ))
-                }
-            })
-            .collect::<Vec<Line>>(),
-        None => vec![Line::from("")],
+    let list_text = match app.mode {
+        Mode::Display => vec![Line::from("")],
+        _ => match selected_package {
+            Some(_) => app
+                .displayed_packages_indices
+                .iter()
+                .map(|index| {
+                    i += 1;
+                    if (i - 1) == app.list_cursor_index {
+                        Line::from(Span::styled(
+                            app.packages[*index].name.to_owned(),
+                            Style::default()
+                                .fg(app.config.colours.normal)
+                                .add_modifier(Modifier::BOLD),
+                        ))
+                    } else {
+                        Line::from(Span::styled(
+                            app.packages[*index].name.to_owned(),
+                            Style::default().fg(app.config.colours.text),
+                        ))
+                    }
+                })
+                .collect::<Vec<Line>>(),
+            None => vec![Line::from("")],
+        },
     };
 
     let mut i: usize = 0;
-    let info_text = match selected_package {
-        Some(pkg) => pkg
-            .info
-            .iter()
+    let info_text = match app.mode {
+        Mode::Display => app
+            .display_text
+            .lines()
             .map(|line| {
-                i += 1;
-                if (i - 1) == app.info_cursor_index {
-                    Line::from(Span::styled(
-                        line.to_owned(),
-                        Style::default()
-                            .fg(app.config.colours.info)
-                            .add_modifier(Modifier::BOLD),
-                    ))
-                } else {
-                    Line::from(Span::styled(
-                        line.to_owned(),
-                        Style::default().fg(app.config.colours.text),
-                    ))
-                }
+                Line::from(Span::styled(
+                    line.to_owned(),
+                    Style::default()
+                        .fg(app.config.colours.text)
+                        .add_modifier(Modifier::BOLD),
+                ))
             })
             .collect::<Vec<Line>>(),
-        None => vec![Line::from("")],
+        _ => match selected_package {
+            Some(pkg) => pkg
+                .info
+                .iter()
+                .map(|line| {
+                    i += 1;
+                    if (i - 1) == app.info_cursor_index {
+                        Line::from(Span::styled(
+                            line.to_owned(),
+                            Style::default()
+                                .fg(app.config.colours.info)
+                                .add_modifier(Modifier::BOLD),
+                        ))
+                    } else {
+                        Line::from(Span::styled(
+                            line.to_owned(),
+                            Style::default().fg(app.config.colours.text),
+                        ))
+                    }
+                })
+                .collect::<Vec<Line>>(),
+            None => vec![Line::from("")],
+        },
     };
 
     app.list_scroll_state = app.list_scroll_state.content_length(list_text.len());
@@ -121,6 +139,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
     let info = Paragraph::new(info_text.to_owned())
         .style(match app.mode {
             Mode::Info => Style::default().fg(app.config.colours.info),
+            Mode::Display => Style::default().fg(app.config.colours.display),
             _ => Style::default(),
         })
         .wrap(Wrap { trim: false })
@@ -128,9 +147,12 @@ pub fn ui(f: &mut Frame, app: &mut App) {
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .title(match selected_package {
-                    Some(pkg) => pkg.name.to_owned(),
-                    None => String::from(""),
+                .title(match app.mode {
+                    Mode::Display => String::from(""),
+                    _ => match selected_package {
+                        Some(pkg) => pkg.name.to_owned(),
+                        None => String::from(""),
+                    },
                 }),
         );
     f.render_widget(info, info_layout[1]);

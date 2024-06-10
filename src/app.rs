@@ -36,6 +36,7 @@ pub struct App {
     pub displayed_packages_indices: Vec<usize>,
     pub current_search: String,
     pub current_command: String,
+    pub display_text: &'static str,
     pub list_scroll_state: ScrollbarState,
     pub info_scroll_state: ScrollbarState,
     pub search_cursor_index: usize,
@@ -51,6 +52,7 @@ impl App {
             packages,
             current_search: String::new(),
             current_command: String::new(),
+            display_text: "",
             list_scroll_state: ScrollbarState::default(),
             info_scroll_state: ScrollbarState::default(),
             search_cursor_index: 0,
@@ -63,6 +65,7 @@ impl App {
 
     pub fn package_list_str(&self) -> String {
         // TODO inefficient
+        // TODO replace with ui.rs display logic
         self.packages
             .iter()
             .map(|p| p.name.to_owned())
