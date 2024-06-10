@@ -165,7 +165,7 @@ fn run_app<B: Backend>(
                             ":help" | ":h" => {
                                 app.clear(Location::Command);
                                 app.display_text = display_texts::HELP_TEXT;
-                                app.mode = Mode::Display;
+                                app.goto_display_mode();
                             }
                             ":quit" | ":q" => {
                                 app.clear(Location::Command);
@@ -183,7 +183,7 @@ fn run_app<B: Backend>(
                             ":c" | "commands" => {
                                 app.clear(Location::Command);
                                 app.display_text = display_texts::COMMAND_LIST;
-                                app.mode = Mode::Display;
+                                app.goto_display_mode();
                             }
                             // TODO user feedback on unknown command
                             _ => {

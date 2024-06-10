@@ -221,4 +221,9 @@ impl App {
         self.mode = Mode::Command;
         self.add_char(':', &Location::Command);
     }
+
+    pub fn goto_display_mode(&mut self) {
+        self.mode = Mode::Display;
+        self.reset_info_scroll();
+    }
 }
