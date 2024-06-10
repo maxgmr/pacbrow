@@ -37,7 +37,7 @@ const TICK_RATE_MS: u64 = 250;
 // TODO sort by size, date installed, etc.
 // TODO search by fields
 // TODO allow copying of line in info mode to clipboard
-// TODO FIX: can't scroll down all the way in info panel
+// TODO FIX: Display mode can only scroll as far as the current package
 fn main() -> Result<(), Box<dyn Error>> {
     // Load config
     let config_toml = read_config()?;
@@ -112,21 +112,13 @@ fn run_app<B: Backend>(
                         }
                         // Scroll up package list
                         KeyCode::Char('k') | KeyCode::Up => {
-                            app.info_cursor_index = 0;
-                            app.cursor_dec(Location::Paclist);
-                            app.list_scroll_state =
-                                app.list_scroll_state.position(app.list_cursor_index);
-                            app.info_scroll_state =
-                                app.info_scroll_state.position(app.info_cursor_index);
+                            app.scroll_up(&Location::Paclist);
+                            app.reset_info_scroll();
                         }
                         // Scroll down package list
                         KeyCode::Char('j') | KeyCode::Down => {
-                            app.info_cursor_index = 0;
-                            app.cursor_inc(Location::Paclist);
-                            app.list_scroll_state =
-                                app.list_scroll_state.position(app.list_cursor_index);
-                            app.info_scroll_state =
-                                app.info_scroll_state.position(app.info_cursor_index);
+                            app.scroll_down(&Location::Paclist);
+                            app.reset_info_scroll();
                         }
                         // Enter info mode for the currently selected package
                         KeyCode::Char('l')
@@ -146,7 +138,6 @@ fn run_app<B: Backend>(
                         }
                         KeyCode::Char('r') => {
                             app.clear(Location::Search);
-                            app.refresh_search();
                             app.mode = Mode::Search;
                         }
                         // Exit info mode
@@ -155,15 +146,11 @@ fn run_app<B: Backend>(
                         }
                         // Scroll up package info
                         KeyCode::Char('k') | KeyCode::Up => {
-                            app.cursor_dec(Location::Pacinfo);
-                            app.info_scroll_state =
-                                app.info_scroll_state.position(app.info_cursor_index);
+                            app.scroll_up(&Location::Pacinfo);
                         }
                         // Scroll down package info
                         KeyCode::Char('j') | KeyCode::Down => {
-                            app.cursor_inc(Location::Pacinfo);
-                            app.info_scroll_state =
-                                app.info_scroll_state.position(app.info_cursor_index);
+                            app.scroll_down(&Location::Pacinfo);
                         }
                         _ => {}
                     },
@@ -185,8 +172,8 @@ fn run_app<B: Backend>(
                                 return Ok(false);
                             }
                             ":p" | ":print" => {
-                                app.print_package_list();
                                 app.clear(Location::Command);
+                                app.print_package_list();
                                 app.mode = Mode::Normal;
                             }
                             ":qp" | ":pq" => {
@@ -215,15 +202,15 @@ fn run_app<B: Backend>(
                         }
                         // Move cursor to the left
                         KeyCode::Left => {
-                            app.cursor_dec(Location::Command);
+                            app.cursor_dec(&Location::Command);
                         }
                         // Move cursor to the right
                         KeyCode::Right => {
-                            app.cursor_inc(Location::Command);
+                            app.cursor_inc(&Location::Command);
                         }
                         // User is typing something
                         KeyCode::Char(new_char) => {
-                            app.add_char(new_char, Location::Command);
+                            app.add_char(new_char, &Location::Command);
                         }
                         _ => {}
                     },
@@ -235,11 +222,11 @@ fn run_app<B: Backend>(
                             // Only enter the colon if config allows; otherwise, switch to command
                             // mode.
                             if app.config.operation.allow_colon_in_search {
-                                app.add_char(':', Location::Search);
+                                app.add_char(':', &Location::Search);
                                 app.refresh_search();
                             } else {
                                 app.mode = Mode::Command;
-                                app.add_char(':', Location::Command);
+                                app.add_char(':', &Location::Command);
                             }
                         }
                         // User is deleting something; if already empty exit search mode
@@ -253,15 +240,15 @@ fn run_app<B: Backend>(
                         }
                         // Move cursor to the left
                         KeyCode::Left => {
-                            app.cursor_dec(Location::Search);
+                            app.cursor_dec(&Location::Search);
                         }
                         // Move cursor to the right
                         KeyCode::Right => {
-                            app.cursor_inc(Location::Search);
+                            app.cursor_inc(&Location::Search);
                         }
                         // User is typing something
                         KeyCode::Char(new_char) => {
-                            app.add_char(new_char, Location::Search);
+                            app.add_char(new_char, &Location::Search);
                             app.refresh_search();
                         }
                         _ => {}
@@ -271,20 +258,15 @@ fn run_app<B: Backend>(
                             app.mode = Mode::Normal;
                         }
                         KeyCode::Char(':') => {
-                            app.mode = Mode::Command;
-                            app.add_char(':', Location::Command);
+                            app.goto_command_mode();
                         }
                         // Scroll up
                         KeyCode::Char('k') | KeyCode::Up => {
-                            app.cursor_dec(Location::Pacinfo);
-                            app.info_scroll_state =
-                                app.info_scroll_state.position(app.info_cursor_index);
+                            app.scroll_up(&Location::Pacinfo);
                         }
                         // Scroll down
                         KeyCode::Char('j') | KeyCode::Down => {
-                            app.cursor_inc(Location::Pacinfo);
-                            app.info_scroll_state =
-                                app.info_scroll_state.position(app.info_cursor_index);
+                            app.scroll_down(&Location::Pacinfo);
                         }
                         _ => {}
                     },

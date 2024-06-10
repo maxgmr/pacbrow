@@ -85,7 +85,7 @@ impl App {
             .collect();
     }
 
-    fn cursor_change(&mut self, location: Location, change: i32) -> usize {
+    fn cursor_change(&mut self, location: &Location, change: i32) -> usize {
         let get_new_index =
             |index, length| (index as i32 + change).clamp(0, length as i32) as usize;
         let new_index: usize;
@@ -118,23 +118,23 @@ impl App {
         new_index
     }
 
-    pub fn cursor_inc(&mut self, location: Location) -> usize {
+    pub fn cursor_inc(&mut self, location: &Location) -> usize {
         self.cursor_change(location, 1)
     }
 
-    pub fn cursor_dec(&mut self, location: Location) -> usize {
+    pub fn cursor_dec(&mut self, location: &Location) -> usize {
         self.cursor_change(location, -1)
     }
 
-    pub fn add_char(&mut self, c: char, location: Location) -> Option<usize> {
+    pub fn add_char(&mut self, c: char, location: &Location) -> Option<usize> {
         match location {
             Location::Search => {
                 self.current_search.insert(self.search_cursor_index, c);
-                Some(self.cursor_inc(Location::Search))
+                Some(self.cursor_inc(&Location::Search))
             }
             Location::Command => {
                 self.current_command.insert(self.command_cursor_index, c);
-                Some(self.cursor_inc(Location::Command))
+                Some(self.cursor_inc(&Location::Command))
             }
             _ => None,
         }
@@ -152,7 +152,7 @@ impl App {
                 if self.search_cursor_index > 0 {
                     self.current_search =
                         new_str(self.current_search.clone(), self.search_cursor_index);
-                    self.cursor_dec(Location::Search);
+                    self.cursor_dec(&Location::Search);
                     Some(self.search_cursor_index)
                 } else {
                     None
@@ -162,7 +162,7 @@ impl App {
                 if self.command_cursor_index > 0 {
                     self.current_command =
                         new_str(self.current_command.clone(), self.command_cursor_index);
-                    self.cursor_dec(Location::Command);
+                    self.cursor_dec(&Location::Command);
                     Some(self.command_cursor_index)
                 } else {
                     None
@@ -177,6 +177,7 @@ impl App {
             Location::Search => {
                 self.current_search = String::new();
                 self.search_cursor_index = 0;
+                self.refresh_search();
             }
             Location::Command => {
                 self.current_command = String::new();
@@ -186,8 +187,38 @@ impl App {
         }
     }
 
+    pub fn reset_info_scroll(&mut self) {
+        self.info_cursor_index = 0;
+        self.update_scroll_state(&Location::Pacinfo);
+    }
+
+    fn update_scroll_state(&mut self, location: &Location) {
+        match location {
+            Location::Paclist => {
+                self.list_scroll_state = self.list_scroll_state.position(self.list_cursor_index);
+            }
+            Location::Pacinfo => {
+                self.info_scroll_state = self.info_scroll_state.position(self.info_cursor_index);
+            }
+            _ => {}
+        }
+    }
+
+    pub fn scroll_up(&mut self, location: &Location) {
+        self.scroll(-1, location);
+    }
+
+    pub fn scroll_down(&mut self, location: &Location) {
+        self.scroll(1, location);
+    }
+
+    fn scroll(&mut self, pos_change: i32, location: &Location) {
+        self.cursor_change(location, pos_change);
+        self.update_scroll_state(location);
+    }
+
     pub fn goto_command_mode(&mut self) {
         self.mode = Mode::Command;
-        self.add_char(':', Location::Command);
+        self.add_char(':', &Location::Command);
     }
 }
