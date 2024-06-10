@@ -185,4 +185,9 @@ impl App {
             _ => {}
         }
     }
+
+    pub fn goto_command_mode(&mut self) {
+        self.mode = Mode::Command;
+        self.add_char(':', Location::Command);
+    }
 }

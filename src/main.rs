@@ -37,6 +37,7 @@ const TICK_RATE_MS: u64 = 250;
 // TODO sort by size, date installed, etc.
 // TODO search by fields
 // TODO allow copying of line in info mode to clipboard
+// TODO FIX: can't scroll down all the way in info panel
 fn main() -> Result<(), Box<dyn Error>> {
     // Load config
     let config_toml = read_config()?;
@@ -100,8 +101,7 @@ fn run_app<B: Backend>(
                 match app.mode {
                     Mode::Normal => match key.code {
                         KeyCode::Char(':') => {
-                            app.mode = Mode::Command;
-                            app.add_char(':', Location::Command);
+                            app.goto_command_mode();
                         }
                         KeyCode::Char('s') => {
                             app.mode = Mode::Search;
@@ -139,8 +139,7 @@ fn run_app<B: Backend>(
                     },
                     Mode::Info => match key.code {
                         KeyCode::Char(':') => {
-                            app.mode = Mode::Command;
-                            app.add_char(':', Location::Command);
+                            app.goto_command_mode();
                         }
                         KeyCode::Char('s') => {
                             app.mode = Mode::Search;
