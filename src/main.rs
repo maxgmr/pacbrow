@@ -1,3 +1,4 @@
+use clap::{command, Arg, ArgAction};
 use cli_clipboard::set_contents;
 use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
@@ -36,9 +37,54 @@ const TICK_RATE_MS: u64 = 250;
 // TODO list number of results and index of current result
 // TODO sort by size, date installed, etc.
 // TODO search by fields
-// TODO allow copying of line in info mode to clipboard
-// TODO FIX: Display mode can only scroll as far as the current package
 fn main() -> Result<(), Box<dyn Error>> {
+    // Parse CLI args
+    let cli_match = command!()
+        .about("A tool that displays packages on Arch Linux systems.")
+        .arg(
+            Arg::new("deps")
+                .short('d')
+                .long("deps")
+                .action(ArgAction::SetTrue)
+                .help("Filter to packages installed as dependencies."),
+        )
+        .arg(
+            Arg::new("explicit")
+                .short('e')
+                .long("explicit")
+                .action(ArgAction::SetTrue)
+                .help("Filter to packages installed explicitly."),
+        )
+        .arg(
+            Arg::new("foreign")
+                .short('m')
+                .long("foreign")
+                .action(ArgAction::SetTrue)
+                .help("Filter to packages not found in the sync database(s)."),
+        )
+        .arg(
+            Arg::new("native")
+                .short('n')
+                .long("native")
+                .action(ArgAction::SetTrue)
+                .help("Filter to packages found in the sync database(s)."),
+        )
+        .arg(
+            Arg::new("unrequired")
+                .short('t')
+                .long("unrequired")
+                .action(ArgAction::SetTrue)
+                .help("Filter to packages neither required nor optionally required by any currently installed package."),
+        )
+        .arg(
+            Arg::new("upgrades")
+                .short('u')
+                .long("upgrades")
+                .action(ArgAction::SetTrue)
+                .help("Filter to packages that are out-of-date on the current system."),
+        )
+        .get_matches();
+
     // Load config
     let config_toml = read_config()?;
 
@@ -233,7 +279,7 @@ fn run_app<B: Backend>(
                                     "Made by Max Gilmour\n\nTo Michayla, who always listens",
                                 );
                             }
-                            // TODO user feedback on unknown command
+                            // Unknown command
                             _ => {
                                 app.clear(Location::Command);
                                 app.mode = Mode::Normal;
