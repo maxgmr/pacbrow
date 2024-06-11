@@ -123,6 +123,7 @@ impl App {
             .filter(|index| self.packages[*index].name.contains(&self.current_search))
             .collect();
         self.refresh_current_paclist();
+        self.refresh_current_pacinfo();
     }
 
     fn cursor_change(&mut self, location: &Location, change: i32) -> usize {
@@ -135,6 +136,7 @@ impl App {
                 self.search_cursor_index = new_index;
             }
             Location::Paclist => {
+                self.refresh_current_pacinfo();
                 let list_len = self.current_paclist.len();
                 new_index = get_new_index(
                     self.list_cursor_index,
@@ -272,6 +274,15 @@ impl App {
 
     pub fn goto_display_mode(&mut self) {
         self.mode = Mode::Display;
+        self.refresh_current_paclist();
+        self.refresh_current_pacinfo();
+        self.reset_info_scroll();
+    }
+
+    pub fn leave_display_mode(&mut self, new_mode: Mode) {
+        self.mode = new_mode;
+        self.refresh_current_paclist();
+        self.refresh_current_pacinfo();
         self.reset_info_scroll();
     }
 }

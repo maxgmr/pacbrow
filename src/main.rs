@@ -266,9 +266,10 @@ fn run_app<B: Backend>(
                     },
                     Mode::Display => match key.code {
                         KeyCode::Esc => {
-                            app.mode = Mode::Normal;
+                            app.leave_display_mode(Mode::Normal);
                         }
                         KeyCode::Char(':') => {
+                            app.leave_display_mode(Mode::Command);
                             app.goto_command_mode();
                         }
                         // Scroll up

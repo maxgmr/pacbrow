@@ -9,80 +9,40 @@ use ratatui::{
 
 use crate::app::{App, Mode, Package};
 
-// TODO: move more logic into app.rs and out of ui.rs
 pub fn ui(f: &mut Frame, app: &mut App) {
-    let selected_package: Option<&Package> = if !app.displayed_packages_indices.is_empty() {
-        Some(&app.packages[app.displayed_packages_indices[app.list_cursor_index]])
-    } else {
-        None
-    };
+    let list_text = (0..app.current_paclist.len())
+        .map(|index| {
+            let mut style = Style::default();
+            if index == app.list_cursor_index {
+                style = style
+                    .fg(app.config.colours.normal)
+                    .add_modifier(Modifier::BOLD);
+            } else {
+                style = style.fg(app.config.colours.text);
+            }
 
-    let mut i: usize = 0;
-    let list_text = match app.mode {
-        Mode::Display => vec![Line::from("")],
-        _ => match selected_package {
-            Some(_) => app
-                .displayed_packages_indices
-                .iter()
-                .map(|index| {
-                    i += 1;
-                    if (i - 1) == app.list_cursor_index {
-                        Line::from(Span::styled(
-                            app.packages[*index].name.to_owned(),
-                            Style::default()
-                                .fg(app.config.colours.normal)
-                                .add_modifier(Modifier::BOLD),
-                        ))
-                    } else {
-                        Line::from(Span::styled(
-                            app.packages[*index].name.to_owned(),
-                            Style::default().fg(app.config.colours.text),
-                        ))
-                    }
-                })
-                .collect::<Vec<Line>>(),
-            None => vec![Line::from("")],
-        },
-    };
+            Line::from(Span::styled(&app.current_paclist[index], style))
+        })
+        .collect::<Vec<Line>>();
 
-    let mut i: usize = 0;
-    let info_text = match app.mode {
-        Mode::Display => app
-            .display_text
-            .lines()
-            .map(|line| {
-                Line::from(Span::styled(
-                    line.to_owned(),
-                    Style::default()
-                        .fg(app.config.colours.text)
-                        .add_modifier(Modifier::BOLD),
-                ))
-            })
-            .collect::<Vec<Line>>(),
-        _ => match selected_package {
-            Some(pkg) => pkg
-                .info
-                .iter()
-                .map(|line| {
-                    i += 1;
-                    if (i - 1) == app.info_cursor_index {
-                        Line::from(Span::styled(
-                            line.to_owned(),
-                            Style::default()
-                                .fg(app.config.colours.info)
-                                .add_modifier(Modifier::BOLD),
-                        ))
+    let info_text = (0..app.current_pacinfo.len())
+        .map(|index| {
+            let mut style = Style::default();
+            if index == app.info_cursor_index {
+                style = style
+                    .fg(if let Mode::Display = app.mode {
+                        app.config.colours.display
                     } else {
-                        Line::from(Span::styled(
-                            line.to_owned(),
-                            Style::default().fg(app.config.colours.text),
-                        ))
-                    }
-                })
-                .collect::<Vec<Line>>(),
-            None => vec![Line::from("")],
-        },
-    };
+                        app.config.colours.info
+                    })
+                    .add_modifier(Modifier::BOLD);
+            } else {
+                style = style.fg(app.config.colours.text);
+            }
+
+            Line::from(Span::styled(&app.current_pacinfo[index], style))
+        })
+        .collect::<Vec<Line>>();
 
     app.list_scroll_state = app.list_scroll_state.content_length(list_text.len());
     app.info_scroll_state = app.info_scroll_state.content_length(info_text.len());
@@ -149,7 +109,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
                 .borders(Borders::ALL)
                 .title(match app.mode {
                     Mode::Display => String::from(""),
-                    _ => match selected_package {
+                    _ => match app.selected_package() {
                         Some(pkg) => pkg.name.to_owned(),
                         None => String::from(""),
                     },
