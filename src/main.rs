@@ -37,6 +37,7 @@ const TICK_RATE_MS: u64 = 250;
 // TODO list number of results and index of current result
 // TODO sort by size, date installed, etc.
 // TODO search by fields
+// TODO list number of packages
 fn main() -> Result<(), Box<dyn Error>> {
     // Parse CLI args
     let cli_match = command!()
@@ -89,10 +90,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     let config_toml = read_config()?;
 
     // Get list of packages
-    let package_list = get_package_list()?;
+    let package_list = get_package_list(&cli_match)?;
 
     if package_list.is_empty() {
-        eprintln!("Unable to get package list. Please ensure you are using pacman as your package manager and that it is working properly.");
+        eprintln!("Unable to get package list. Please ensure that you are using pacman as your package manager, it is working properly, and you have not entered conflicting arguments.");
     }
 
     // Terminal setup
