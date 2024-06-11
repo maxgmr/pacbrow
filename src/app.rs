@@ -36,6 +36,8 @@ pub struct App {
     pub displayed_packages_indices: Vec<usize>,
     pub current_search: String,
     pub current_command: String,
+    pub current_paclist: Vec<String>,
+    pub current_pacinfo: Vec<String>,
     pub display_text: &'static str,
     pub list_scroll_state: ScrollbarState,
     pub info_scroll_state: ScrollbarState,
@@ -46,12 +48,14 @@ pub struct App {
 }
 impl App {
     pub fn new(config: ConfigToml, packages: Vec<Package>) -> Self {
-        Self {
+        let mut app = Self {
             mode: config.operation.starting_mode,
             displayed_packages_indices: (0..packages.len()).collect(),
             packages,
             current_search: String::new(),
             current_command: String::new(),
+            current_paclist: vec![String::from("")],
+            current_pacinfo: vec![String::from("")],
             display_text: "",
             list_scroll_state: ScrollbarState::default(),
             info_scroll_state: ScrollbarState::default(),
@@ -60,21 +64,56 @@ impl App {
             info_cursor_index: 0,
             command_cursor_index: 0,
             config,
-        }
-    }
-
-    pub fn package_list_str(&self) -> String {
-        // TODO inefficient
-        // TODO replace with ui.rs display logic
-        self.packages
-            .iter()
-            .map(|p| p.name.to_owned())
-            .collect::<Vec<String>>()
-            .join("\n")
+        };
+        app.refresh_search();
+        app
     }
 
     pub fn print_package_list(&self) {
-        println!("{}", self.package_list_str());
+        println!("{}", self.current_paclist.join("\n"));
+    }
+
+    pub fn refresh_current_paclist(&mut self) {
+        self.current_paclist = match self.mode {
+            Mode::Display => {
+                vec![String::from("")]
+            }
+            _ => {
+                if self.selected_package().is_some() {
+                    self.displayed_packages_indices
+                        .iter()
+                        .map(|index| self.packages[*index].name.to_owned())
+                        .collect::<Vec<String>>()
+                } else {
+                    vec![String::from("")]
+                }
+            }
+        }
+    }
+
+    pub fn refresh_current_pacinfo(&mut self) {
+        self.current_pacinfo = match self.mode {
+            Mode::Display => self
+                .display_text
+                .lines()
+                .map(|line| line.to_owned())
+                .collect::<Vec<String>>(),
+            _ => {
+                if let Some(selected_package) = self.selected_package() {
+                    selected_package.info.to_owned()
+                } else {
+                    vec![String::from("")]
+                }
+            }
+        }
+    }
+
+    pub fn selected_package(&self) -> Option<&Package> {
+        if !self.displayed_packages_indices.is_empty() {
+            Some(&self.packages[self.displayed_packages_indices[self.list_cursor_index]])
+        } else {
+            None
+        }
     }
 
     pub fn refresh_search(&mut self) {
@@ -83,6 +122,7 @@ impl App {
         self.displayed_packages_indices = (0..self.packages.len())
             .filter(|index| self.packages[*index].name.contains(&self.current_search))
             .collect();
+        self.refresh_current_paclist();
     }
 
     fn cursor_change(&mut self, location: &Location, change: i32) -> usize {
@@ -95,7 +135,7 @@ impl App {
                 self.search_cursor_index = new_index;
             }
             Location::Paclist => {
-                let list_len = self.displayed_packages_indices.len();
+                let list_len = self.current_paclist.len();
                 new_index = get_new_index(
                     self.list_cursor_index,
                     if list_len > 0 { list_len - 1 } else { 0 },
@@ -103,7 +143,7 @@ impl App {
                 self.list_cursor_index = new_index;
             }
             Location::Pacinfo => {
-                let info_len = self.packages[self.list_cursor_index].info.len();
+                let info_len = self.current_pacinfo.len();
                 new_index = get_new_index(
                     self.info_cursor_index,
                     if info_len > 0 { info_len - 1 } else { 0 },
@@ -202,6 +242,14 @@ impl App {
             }
             _ => {}
         }
+    }
+
+    pub fn scroll_down_fast(&mut self, location: &Location) {
+        self.scroll(10, location);
+    }
+
+    pub fn scroll_up_fast(&mut self, location: &Location) {
+        self.scroll(-10, location);
     }
 
     pub fn scroll_up(&mut self, location: &Location) {

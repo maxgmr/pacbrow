@@ -32,7 +32,6 @@ const TICK_RATE_MS: u64 = 250;
 // Planned features
 // TODO filters; AUR only, orphans only, explicitly installed only, etc.
 // TODO non-latin characters
-// TODO help page
 // TODO list number of results and index of current result
 // TODO sort by size, date installed, etc.
 // TODO search by fields
@@ -103,6 +102,12 @@ fn run_app<B: Backend>(
                         KeyCode::Char(':') => {
                             app.goto_command_mode();
                         }
+                        KeyCode::Char('u') => {
+                            app.scroll_up_fast(&Location::Paclist);
+                        }
+                        KeyCode::Char('d') => {
+                            app.scroll_down_fast(&Location::Paclist);
+                        }
                         KeyCode::Char('s') => {
                             app.mode = Mode::Search;
                         }
@@ -139,6 +144,12 @@ fn run_app<B: Backend>(
                         KeyCode::Char('r') => {
                             app.clear(Location::Search);
                             app.mode = Mode::Search;
+                        }
+                        KeyCode::Char('u') => {
+                            app.scroll_up_fast(&Location::Pacinfo);
+                        }
+                        KeyCode::Char('d') => {
+                            app.scroll_down_fast(&Location::Pacinfo);
                         }
                         // Exit info mode
                         KeyCode::Esc | KeyCode::Char('h') | KeyCode::Char('n') | KeyCode::Left => {
@@ -267,6 +278,12 @@ fn run_app<B: Backend>(
                         // Scroll down
                         KeyCode::Char('j') | KeyCode::Down => {
                             app.scroll_down(&Location::Pacinfo);
+                        }
+                        KeyCode::Char('u') => {
+                            app.scroll_up_fast(&Location::Pacinfo);
+                        }
+                        KeyCode::Char('d') => {
+                            app.scroll_down_fast(&Location::Pacinfo);
                         }
                         _ => {}
                     },

@@ -37,6 +37,8 @@ s                       Enter search mode
 r                       Enter search mode, clearing whatever was previously typed
 k,<Up>                  Scroll up the list of packages
 j,<Down>                Scroll down the list of packages
+u                       Scroll 10 lines up the list of packages
+d                       Scroll 10 lines down the list of packages
 l,i,<Right>,<Enter>     Enter info mode for the currently selected package
 
 COMMAND MODE
@@ -59,12 +61,16 @@ r                       Enter search mode, clearing whatever was previously type
 h,n,<Esc>,<Left>        Exit info mode, returning to normal mode and the package list
 k,<Up>                  Scroll up this package's information
 j,<Down>                Scroll down this package's information
+u                       Scroll 10 lines up this package's information
+d                       Scroll 10 lines down this package's information
 
 DISPLAY MODE
 <Esc>                   Enter normal mode, closing the display
 :                       Enter command mode, closing the display
 k,<Up>                  Scroll up the displayed text
 j,<Down>                Scroll down the displayed text
+u                       Scroll 10 lines up the displayed text
+d                       Scroll 10 lines down the displayed text
 -------
 
 
