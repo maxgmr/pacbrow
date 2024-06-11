@@ -91,7 +91,10 @@ impl App {
                     vec![String::from("")]
                 }
             }
-        }
+        };
+        self.list_scroll_state = self
+            .list_scroll_state
+            .content_length(self.current_paclist.len());
     }
 
     pub fn refresh_current_pacinfo(&mut self) {
@@ -108,7 +111,10 @@ impl App {
                     vec![String::from("")]
                 }
             }
-        }
+        };
+        self.info_scroll_state = self
+            .info_scroll_state
+            .content_length(self.current_pacinfo.len());
     }
 
     pub fn selected_package(&self) -> Option<&Package> {

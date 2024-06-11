@@ -44,9 +44,6 @@ pub fn ui(f: &mut Frame, app: &mut App) {
         })
         .collect::<Vec<Line>>();
 
-    app.list_scroll_state = app.list_scroll_state.content_length(list_text.len());
-    app.info_scroll_state = app.info_scroll_state.content_length(info_text.len());
-
     let search_info_layout = Layout::default()
         .direction(Direction::Vertical)
         .constraints(vec![
