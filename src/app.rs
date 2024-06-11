@@ -120,8 +120,8 @@ impl App {
     }
 
     pub fn refresh_search(&mut self) {
-        self.list_cursor_index = 0;
-        self.info_cursor_index = 0;
+        self.cursor_jump(&Location::Paclist, 0);
+        self.cursor_jump(&Location::Pacinfo, 0);
         self.displayed_packages_indices = (0..self.packages.len())
             .filter(|index| self.packages[*index].name.contains(&self.current_search))
             .collect();
@@ -139,13 +139,13 @@ impl App {
                 self.search_cursor_index = new_index;
             }
             Location::Paclist => {
-                self.refresh_current_pacinfo();
                 let list_len = self.current_paclist.len();
                 new_index = get_new_index(
                     self.list_cursor_index,
                     if list_len > 0 { list_len - 1 } else { 0 },
                 );
                 self.list_cursor_index = new_index;
+                self.refresh_current_pacinfo();
             }
             Location::Pacinfo => {
                 let info_len = self.current_pacinfo.len();
@@ -160,7 +160,18 @@ impl App {
                 self.command_cursor_index = new_index;
             }
         }
+        self.update_scroll_state(location);
         new_index
+    }
+
+    pub fn cursor_jump(&mut self, location: &Location, line_num: usize) -> usize {
+        let current = match location {
+            Location::Paclist => self.list_cursor_index,
+            Location::Pacinfo => self.info_cursor_index,
+            Location::Command => self.command_cursor_index,
+            Location::Search => self.search_cursor_index,
+        };
+        self.cursor_change(location, line_num as i32 - current as i32)
     }
 
     pub fn cursor_inc(&mut self, location: &Location) -> usize {
@@ -267,7 +278,6 @@ impl App {
 
     fn scroll(&mut self, pos_change: i32, location: &Location) {
         self.cursor_change(location, pos_change);
-        self.update_scroll_state(location);
     }
 
     pub fn goto_command_mode(&mut self) {

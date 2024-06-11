@@ -103,12 +103,6 @@ fn run_app<B: Backend>(
                         KeyCode::Char(':') => {
                             app.goto_command_mode();
                         }
-                        KeyCode::Char('u') => {
-                            app.scroll_up_fast(&Location::Paclist);
-                        }
-                        KeyCode::Char('d') => {
-                            app.scroll_down_fast(&Location::Paclist);
-                        }
                         KeyCode::Char('s') => {
                             app.mode = Mode::Search;
                         }
@@ -134,6 +128,20 @@ fn run_app<B: Backend>(
                         KeyCode::Char('j') | KeyCode::Down => {
                             app.scroll_down(&Location::Paclist);
                             app.reset_info_scroll();
+                        }
+                        KeyCode::Char('u') => {
+                            app.scroll_up_fast(&Location::Paclist);
+                            app.reset_info_scroll();
+                        }
+                        KeyCode::Char('d') => {
+                            app.scroll_down_fast(&Location::Paclist);
+                            app.reset_info_scroll();
+                        }
+                        KeyCode::Char('g') => {
+                            app.cursor_jump(&Location::Paclist, 0);
+                        }
+                        KeyCode::Char('G') => {
+                            app.cursor_jump(&Location::Paclist, app.current_paclist.len() - 1);
                         }
                         // Enter info mode for the currently selected package
                         KeyCode::Char('l')
@@ -181,6 +189,12 @@ fn run_app<B: Backend>(
                         // Scroll down package info
                         KeyCode::Char('j') | KeyCode::Down => {
                             app.scroll_down(&Location::Pacinfo);
+                        }
+                        KeyCode::Char('g') => {
+                            app.cursor_jump(&Location::Pacinfo, 0);
+                        }
+                        KeyCode::Char('G') => {
+                            app.cursor_jump(&Location::Pacinfo, app.current_pacinfo.len() - 1);
                         }
                         _ => {}
                     },
@@ -310,6 +324,12 @@ fn run_app<B: Backend>(
                         }
                         KeyCode::Char('d') => {
                             app.scroll_down_fast(&Location::Pacinfo);
+                        }
+                        KeyCode::Char('g') => {
+                            app.cursor_jump(&Location::Pacinfo, 0);
+                        }
+                        KeyCode::Char('G') => {
+                            app.cursor_jump(&Location::Pacinfo, app.current_pacinfo.len() - 1);
                         }
                         _ => {}
                     },

@@ -39,6 +39,8 @@ k,<Up>                  Scroll up the list of packages
 j,<Down>                Scroll down the list of packages
 u                       Scroll 10 lines up the list of packages
 d                       Scroll 10 lines down the list of packages
+g                       Jump to top of package list
+G                       Jump to bottom of package list
 y                       Copy currently-selected package name to clipboard
 Y                       Copy current package list to clipboard
 l,i,<Right>,<Enter>     Enter info mode for the currently selected package
@@ -65,6 +67,8 @@ k,<Up>                  Scroll up this package's information
 j,<Down>                Scroll down this package's information
 u                       Scroll 10 lines up this package's information
 d                       Scroll 10 lines down this package's information
+g                       Jump to top of package info
+G                       Jump to bottom of package info
 y                       Copy current line of package info to clipboard
 Y                       Copy package info to clipboard
 
@@ -75,6 +79,8 @@ k,<Up>                  Scroll up the displayed text
 j,<Down>                Scroll down the displayed text
 u                       Scroll 10 lines up the displayed text
 d                       Scroll 10 lines down the displayed text
+g                       Jump to top of displayed text
+G                       Jump to bottom of displayed text
 -------
 
 
