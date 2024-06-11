@@ -39,6 +39,8 @@ k,<Up>                  Scroll up the list of packages
 j,<Down>                Scroll down the list of packages
 u                       Scroll 10 lines up the list of packages
 d                       Scroll 10 lines down the list of packages
+y                       Copy currently-selected package name to clipboard
+Y                       Copy current package list to clipboard
 l,i,<Right>,<Enter>     Enter info mode for the currently selected package
 
 COMMAND MODE
@@ -63,6 +65,8 @@ k,<Up>                  Scroll up this package's information
 j,<Down>                Scroll down this package's information
 u                       Scroll 10 lines up this package's information
 d                       Scroll 10 lines down this package's information
+y                       Copy current line of package info to clipboard
+Y                       Copy package info to clipboard
 
 DISPLAY MODE
 <Esc>                   Enter normal mode, closing the display
