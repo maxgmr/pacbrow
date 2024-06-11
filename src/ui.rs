@@ -7,7 +7,7 @@ use ratatui::{
     Frame,
 };
 
-use crate::app::{App, Mode, Package};
+use crate::app::{App, Mode};
 
 pub fn ui(f: &mut Frame, app: &mut App) {
     let list_text = (0..app.current_paclist.len())

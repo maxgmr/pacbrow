@@ -1,6 +1,6 @@
 [package]
 name = "pacbrow"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 authors = ["Max Gilmour"]
 readme = "README.md"
@@ -8,13 +8,14 @@ repository = "https://github.com/maxgmr/pacbrow"
 license-file = "LICENSE"
 
 [dependencies]
-clap = { version = ">=4.5.4", features = ["cargo"] }
-serde = { version = ">=1.0", features = ["derive"] }
-toml = ">=0.8"
-home = ">=0.5"
-ratatui = { version = ">=0.26", features = ["serde"] }
-crossterm = ">=0.25"
-regex = ">=1.10"
+clap = { version = "4", features = ["cargo"] }
+serde = { version = "1", features = ["derive"] }
+toml = "0"
+home = "0"
+ratatui = { version = "0", features = ["serde"] }
+crossterm = "0"
+regex = "1"
+cli-clipboard = "0"
 
 [dev-dependencies]
-pretty_assertions = "1.4.0"
+pretty_assertions = "1"

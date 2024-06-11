@@ -1,3 +1,4 @@
+use cli_clipboard::set_contents;
 use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
     execute,
@@ -115,6 +116,15 @@ fn run_app<B: Backend>(
                             app.clear(Location::Search);
                             app.mode = Mode::Search;
                         }
+                        // Yank selected package name
+                        KeyCode::Char('y') => {
+                            set_contents(app.current_paclist[app.list_cursor_index].to_owned())
+                                .unwrap();
+                        }
+                        // Yank current package list
+                        KeyCode::Char('Y') => {
+                            set_contents(app.current_paclist.join("\n").to_owned()).unwrap();
+                        }
                         // Scroll up package list
                         KeyCode::Char('k') | KeyCode::Up => {
                             app.scroll_up(&Location::Paclist);
@@ -144,6 +154,15 @@ fn run_app<B: Backend>(
                         KeyCode::Char('r') => {
                             app.clear(Location::Search);
                             app.mode = Mode::Search;
+                        }
+                        // Yank current line
+                        KeyCode::Char('y') => {
+                            set_contents(app.current_pacinfo[app.info_cursor_index].to_owned())
+                                .unwrap();
+                        }
+                        // Yank package info
+                        KeyCode::Char('Y') => {
+                            set_contents(app.current_pacinfo.join("\n").to_owned()).unwrap();
                         }
                         KeyCode::Char('u') => {
                             app.scroll_up_fast(&Location::Pacinfo);
@@ -194,6 +213,12 @@ fn run_app<B: Backend>(
                             ":c" | "commands" => {
                                 app.clear(Location::Command);
                                 app.display_text = display_texts::COMMAND_LIST;
+                                app.goto_display_mode();
+                            }
+                            ":dedication" | ":love" => {
+                                app.clear(Location::Command);
+                                app.display_text =
+                                    "Made by Max Gilmour\n\nTo Michayla, who always listens";
                                 app.goto_display_mode();
                             }
                             // TODO user feedback on unknown command

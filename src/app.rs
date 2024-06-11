@@ -30,6 +30,9 @@ pub enum Location {
 }
 
 pub struct App {
+    // TODO potentially remove display_text
+    //      - fn goto_display_mode(&str), sets current_pacinfo there
+    // TODO make fields private
     pub mode: Mode,
     pub config: ConfigToml,
     pub packages: Vec<Package>,
