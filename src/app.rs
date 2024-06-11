@@ -30,9 +30,6 @@ pub enum Location {
 }
 
 pub struct App {
-    // TODO potentially remove display_text
-    //      - fn goto_display_mode(&str), sets current_pacinfo there
-    // TODO make fields private
     pub mode: Mode,
     pub config: ConfigToml,
     pub packages: Vec<Package>,
@@ -41,7 +38,7 @@ pub struct App {
     pub current_command: String,
     pub current_paclist: Vec<String>,
     pub current_pacinfo: Vec<String>,
-    pub display_text: &'static str,
+    display_text: &'static str,
     pub list_scroll_state: ScrollbarState,
     pub info_scroll_state: ScrollbarState,
     pub search_cursor_index: usize,
@@ -291,8 +288,9 @@ impl App {
         self.add_char(':', &Location::Command);
     }
 
-    pub fn goto_display_mode(&mut self) {
+    pub fn goto_display_mode(&mut self, string: &'static str) {
         self.mode = Mode::Display;
+        self.display_text = string;
         self.refresh_current_paclist();
         self.refresh_current_pacinfo();
         self.reset_info_scroll();

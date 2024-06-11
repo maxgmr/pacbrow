@@ -208,8 +208,7 @@ fn run_app<B: Backend>(
                         KeyCode::Enter => match app.current_command.as_str() {
                             ":help" | ":h" => {
                                 app.clear(Location::Command);
-                                app.display_text = display_texts::HELP_TEXT;
-                                app.goto_display_mode();
+                                app.goto_display_mode(display_texts::HELP_TEXT);
                             }
                             ":quit" | ":q" => {
                                 app.clear(Location::Command);
@@ -226,14 +225,13 @@ fn run_app<B: Backend>(
                             }
                             ":c" | "commands" => {
                                 app.clear(Location::Command);
-                                app.display_text = display_texts::COMMAND_LIST;
-                                app.goto_display_mode();
+                                app.goto_display_mode(display_texts::COMMAND_LIST);
                             }
                             ":dedication" | ":love" => {
                                 app.clear(Location::Command);
-                                app.display_text =
-                                    "Made by Max Gilmour\n\nTo Michayla, who always listens";
-                                app.goto_display_mode();
+                                app.goto_display_mode(
+                                    "Made by Max Gilmour\n\nTo Michayla, who always listens",
+                                );
                             }
                             // TODO user feedback on unknown command
                             _ => {
