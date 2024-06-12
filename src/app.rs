@@ -32,8 +32,8 @@ pub enum Location {
 pub struct App {
     pub mode: Mode,
     pub config: ConfigToml,
-    pub packages: Vec<Package>,
-    pub displayed_packages_indices: Vec<usize>,
+    packages: Vec<Package>,
+    displayed_packages_indices: Vec<usize>,
     pub current_search: String,
     pub current_command: String,
     pub current_paclist: Vec<String>,

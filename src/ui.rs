@@ -78,7 +78,11 @@ pub fn ui(f: &mut Frame, app: &mut App) {
         })
         .wrap(Wrap { trim: false })
         .scroll((app.list_cursor_index as u16, 0))
-        .block(Block::default().borders(Borders::ALL).title("Packages"));
+        .block(Block::default().borders(Borders::ALL).title(format!(
+            "Packages ({}/{})",
+            app.list_cursor_index + 1,
+            app.current_paclist.len()
+        )));
     f.render_widget(pac_list, info_layout[0]);
     f.render_stateful_widget(
         Scrollbar::new(ScrollbarOrientation::VerticalLeft)

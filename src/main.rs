@@ -32,7 +32,6 @@ use crate::{
 const TICK_RATE_MS: u64 = 250;
 
 // Planned features
-// TODO filters; AUR only, orphans only, explicitly installed only, etc.
 // TODO non-latin characters
 // TODO list number of results and index of current result
 // TODO sort by size, date installed, etc.
